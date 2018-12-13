@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 import lombok.Getter;
 
-public class GeneratePeopleReferential {
+public class PeopleReferentialGenerator {
 
 	private static final String SURNAME_FILE = "bdd_noms.txt";
 	private static final String FIRSTNAME_FILE = "bdd_prenoms.txt";
@@ -21,7 +21,7 @@ public class GeneratePeopleReferential {
 	}
 
 	private static void generateSurnameReferential() {
-		GeneratePeopleReferential generator = new GeneratePeopleReferential();
+		PeopleReferentialGenerator generator = new PeopleReferentialGenerator();
 		List<SurnamePeople> nomMap = generator.extractSurnamesFromFile();
 		File prenomFile = new File(SURNAME_REFERENTIAL);
 		List<String> prenoms = nomMap.stream()
@@ -32,7 +32,7 @@ public class GeneratePeopleReferential {
 	}
 
 	private static void generateFirstNameReferential() {
-		GeneratePeopleReferential generator = new GeneratePeopleReferential();
+		PeopleReferentialGenerator generator = new PeopleReferentialGenerator();
 		Map<Integer, List<FirstNamePeople>> prenomMap = generator.extractFirstNamesFromFile();
 		File prenomFile = new File(FIRSTNAME_REFERENTIAL);
 		List<String> prenoms = prenomMap.keySet().stream().map(sex -> prenomMap.get(sex).stream()

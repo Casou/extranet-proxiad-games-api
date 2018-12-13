@@ -7,11 +7,14 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import org.springframework.stereotype.Component;
+
 import com.proxiad.games.extranet.model.People;
 
 import lombok.Getter;
 
-public class GeneratePeople {
+@Component
+public class PeopleGenerator {
 
 	private static final Map<Integer, Integer> MAP_MAX_PICTURE_INDEX_BY_SEX = new HashMap<Integer, Integer>() {{
 		put(1, 26);
@@ -30,20 +33,21 @@ public class GeneratePeople {
 	private LocalDateTime birthdayMinDate;
 	private LocalDateTime arrivalMaxDate;
 
-	GeneratePeople() {
+	PeopleGenerator() {
 		this.birthdayMinDate = LocalDateTime.of(1975, Month.JANUARY, 1, 0, 0);
 		this.arrivalMaxDate = LocalDateTime.now().minusMonths(3);
 	}
 
 	public static void main(String[] args) {
-		GeneratePeople generator = new GeneratePeople();
-		generator.generatePeople(200);
+		PeopleGenerator generator = new PeopleGenerator();
+		generator.generatePeople(20)
+		.forEach(System.out::println);
 	}
 
 
 	public List<People> generatePeople(Integer nbPeople) {
-		File firstNameReferential = new File(GeneratePeopleReferential.FIRSTNAME_REFERENTIAL);
-		File surnameReferential = new File(GeneratePeopleReferential.SURNAME_REFERENTIAL);
+		File firstNameReferential = new File(PeopleReferentialGenerator.FIRSTNAME_REFERENTIAL);
+		File surnameReferential = new File(PeopleReferentialGenerator.SURNAME_REFERENTIAL);
 
 		List<FirstNameRef> firstNameRef = FileUtils.readFile(firstNameReferential).stream().map(FirstNameRef::new).collect(Collectors.toList());
 		List<SurnameRef> surnameRef = FileUtils.readFile(surnameReferential).stream().map(SurnameRef::new).collect(Collectors.toList());
@@ -59,8 +63,8 @@ public class GeneratePeople {
 			SurnameRef surname = flatSurnameRef.get((int) Math.round(Math.random() * flatFirstNameRef.size()));
 
 			people.setSex(firstName.getSex());
-			people.setName(firstName.getName());
-			people.setSurname(surname.getName());
+			people.setName(StringUtils.capitalize(firstName.getName()));
+			people.setSurname(StringUtils.capitalize(surname.getName()));
 			people.setEmail(people.getName().toLowerCase() + "." + people.getSurname().toLowerCase() + "@proxiad.fr");
 			people.setPhone(generatePhone());
 			people.setBirthDate(generateBirthdayDate());
@@ -84,9 +88,9 @@ public class GeneratePeople {
 	}
 
 	private String generatePhone() {
-		return Math.random() < 0.75 ? "06." : "07." +
+		return (Math.random() < 0.75 ? "06." : "07.") +
 				IntStream.range(0, 4)
-						.mapToObj(idx -> String.format("%05d", Math.round(Math.random() * 99)))
+						.mapToObj(idx -> String.format("%02d", Math.round(Math.random() * 99)))
 						.collect(Collectors.joining("."));
 	}
 
