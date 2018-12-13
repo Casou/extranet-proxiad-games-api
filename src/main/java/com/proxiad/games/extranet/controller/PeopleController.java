@@ -1,19 +1,27 @@
 package com.proxiad.games.extranet.controller;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.proxiad.games.extranet.dto.PeopleDto;
+import com.proxiad.games.extranet.dto.PeopleNameDto;
+import com.proxiad.games.extranet.repository.PeopleRepository;
 
 @RestController
 public class PeopleController {
 
+	@Autowired
+	private PeopleRepository peopleRepository;
+
 	@GetMapping("/people/all")
-	public List<PeopleDto> getAll() {
-		return new ArrayList<>();
+	public List<PeopleNameDto> getAll() {
+		return StreamSupport.stream(peopleRepository.findAll().spliterator(), false)
+				.map(PeopleNameDto::new)
+				.collect(Collectors.toList());
 	}
 
 }

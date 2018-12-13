@@ -6,19 +6,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.proxiad.games.extranet.model.People;
-
 import lombok.Getter;
 
-public class GeneratePeople {
+public class GeneratePeopleReferential {
 
 	private static final String SURNAME_FILE = "bdd_noms.txt";
-	private static final String NAME_FILE = "bdd_prenoms.txt";
-
-
-	public static List<People> generatePeople(Integer nbPeople) {
-
-	}
+	private static final String FIRSTNAME_FILE = "bdd_prenoms.txt";
+	public static final String SURNAME_REFERENTIAL = "src/main/resources/referentiel_noms.txt";
+	public static final String FIRSTNAME_REFERENTIAL = "src/main/resources/referentiel_prenoms.txt";
 
 	public static void main(String[] args) {
 		generateFirstNameReferential();
@@ -26,9 +21,9 @@ public class GeneratePeople {
 	}
 
 	private static void generateSurnameReferential() {
-		GeneratePeople generator = new GeneratePeople();
-		List<FirstNamePeople> nomMap = generator.extractSurnamesFromFile();
-		File prenomFile = new File("src/main/resources/referentiel_noms.txt");
+		GeneratePeopleReferential generator = new GeneratePeopleReferential();
+		List<SurnamePeople> nomMap = generator.extractSurnamesFromFile();
+		File prenomFile = new File(SURNAME_REFERENTIAL);
 		List<String> prenoms = nomMap.stream()
 				.map(personPrenom -> personPrenom.getName() + "\t" + personPrenom.getNombre())
 				.collect(Collectors.toList());
@@ -37,9 +32,9 @@ public class GeneratePeople {
 	}
 
 	private static void generateFirstNameReferential() {
-		GeneratePeople generator = new GeneratePeople();
+		GeneratePeopleReferential generator = new GeneratePeopleReferential();
 		Map<Integer, List<FirstNamePeople>> prenomMap = generator.extractFirstNamesFromFile();
-		File prenomFile = new File("src/main/resources/referentiel_prenoms.txt");
+		File prenomFile = new File(FIRSTNAME_REFERENTIAL);
 		List<String> prenoms = prenomMap.keySet().stream().map(sex -> prenomMap.get(sex).stream()
 				.map(personPrenom -> personPrenom.getSex() + "\t" + personPrenom.getName() + "\t" + personPrenom.getNombre())
 				.collect(Collectors.toList()))
@@ -49,34 +44,21 @@ public class GeneratePeople {
 		FileUtils.writeInFile(prenomFile, prenoms);
 	}
 
-	private List<FirstNamePeople> extractSurnamesFromFile() {
-		//Get file from resources folder
+	private List<SurnamePeople> extractSurnamesFromFile() {
 		List<String> lines = getFileContent(SURNAME_FILE);
 
 		return lines.stream()
-				.map(line -> new FirstNamePeople(
-						null,
-						line.split("\t")[0].trim(),
-						Integer.valueOf(line.split("\t")[11].trim())
-				))
+				.map(SurnamePeople::new)
 				.filter(people -> people.getNombre() >= 600)
-//				.filter(name -> name.length() > 4 && name.charAt(0) != name.charAt(1))
-//				.sorted()
 				.collect(Collectors.toList());
 	}
 
 	private Map<Integer, List<FirstNamePeople>> extractFirstNamesFromFile() {
-		List<String> lines = getFileContent(NAME_FILE);
+		List<String> lines = getFileContent(FIRSTNAME_FILE);
 
 		return lines.stream()
-				.map(line -> new FirstNamePeople(
-						Integer.valueOf(line.split("\t")[0].trim()),
-						line.split("\t")[1].trim(),
-						Integer.valueOf(line.split("\t")[3].trim())
-				))
+				.map(FirstNamePeople::new)
 				.filter(people -> people.getNombre() >= 300)
-//				.filter(people -> people.getName().length() > 4
-//						&& people.getName().charAt(0) != people.getName().charAt(1))
 				.sorted(Comparator.comparing(FirstNamePeople::getName))
 				.distinct()
 				.collect(Collectors.groupingBy(FirstNamePeople::getSex, Collectors.toList()));
@@ -96,7 +78,7 @@ public class GeneratePeople {
 		return new File(classLoader.getResource(nameFile).getFile());
 	}
 
-	class FirstNamePeople {
+	private class FirstNamePeople {
 		@Getter
 		private Integer sex;
 		@Getter
@@ -104,28 +86,43 @@ public class GeneratePeople {
 		@Getter
 		private Integer nombre;
 
-		FirstNamePeople(Integer sex, String name, Integer nombre) {
-			this.sex = sex;
-			this.name = name;
-			this.nombre = nombre;
-		}
-
-		@Override
-		public String toString() {
-			return this.getSex() + " " + this.getName();
+		FirstNamePeople(String line) {
+			this.sex = Integer.valueOf(line.split("\t")[0].trim());
+			this.name = line.split("\t")[1].trim();
+			this.nombre = Integer.valueOf(line.split("\t")[3].trim());
 		}
 
 		@Override
 		public boolean equals(Object o) {
-			if (this == o) return true;
-			if (o == null || getClass() != o.getClass()) return false;
-			FirstNamePeople people = (FirstNamePeople) o;
-			return name.equals(people.getName());
+			return name.equals(((FirstNamePeople) o).getName());
 		}
 
 		@Override
 		public int hashCode() {
-			return this.name.hashCode();
+			return this.getName().hashCode();
+		}
+
+	}
+
+	private class SurnamePeople {
+		@Getter
+		private String name;
+		@Getter
+		private Integer nombre;
+
+		SurnamePeople(String line) {
+			this.name = line.split("\t")[0].trim();
+			this.nombre = Integer.valueOf(line.split("\t")[11].trim());
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			return name.equals(((SurnamePeople) o).getName());
+		}
+
+		@Override
+		public int hashCode() {
+			return this.getName().hashCode();
 		}
 	}
 
