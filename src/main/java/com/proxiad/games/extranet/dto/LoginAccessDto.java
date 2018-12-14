@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class LoginAccess {
+public class LoginAccessDto {
 
 	private String token;
 
