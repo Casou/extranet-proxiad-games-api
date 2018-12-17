@@ -38,24 +38,29 @@ public class JWTFilter extends GenericFilterBean {
 			response.setStatus(HttpServletResponse.SC_OK);
 			filterChain.doFilter(req, res);
 		} else {
-			Optional<Token> optionalToken = this.tokenRepository.findById(token);
-			if (token == null || !isTokenValid(optionalToken)) {
+			if (token == null) {
 				response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-			} else {
-				Token tokenEntity = optionalToken.get();
-				 tokenEntity.setExpirationDate(LocalDateTime.now().plusHours(1));
-				tokenRepository.save(tokenEntity);
+				return;
+			}
+			Optional<Token> optionalToken = this.tokenRepository.findById(token);
+			if (!optionalToken.isPresent() || !isTokenValid(optionalToken.get())) {
+				response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+				return;
+			}
+
+			Token tokenEntity = optionalToken.get();
+			tokenEntity.setExpirationDate(LocalDateTime.now().plusHours(1));
+			tokenRepository.save(tokenEntity);
 
 //				ObjectId userId = new ObjectId(tokenService.getUserIdFromToken(token));
 //				request.setAttribute("userId", "test");
 
-				filterChain.doFilter(req, res);
-			}
+			filterChain.doFilter(req, res);
 		}
 	}
 
-	public boolean isTokenValid(Optional<Token> token) {
-		return token.isPresent() && token.get().getExpirationDate().isAfter(LocalDateTime.now());
+	public boolean isTokenValid(Token token) {
+		return token.getExpirationDate().isAfter(LocalDateTime.now());
 	}
 
 	public boolean allowRequestWithoutToken(HttpServletRequest request) {
