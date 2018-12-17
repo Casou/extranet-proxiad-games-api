@@ -9,4 +9,7 @@ import com.proxiad.games.extranet.model.People;
 
 @Repository
 public interface PeopleRepository extends CrudRepository<People, Integer> {
+
+	List<People> findAllByOrderBySurnameAscNameAsc();
+
 }

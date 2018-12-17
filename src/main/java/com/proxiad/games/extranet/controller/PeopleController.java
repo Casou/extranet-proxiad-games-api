@@ -21,7 +21,8 @@ public class PeopleController {
 
 	@GetMapping("/people/all")
 	public List<PeopleNameDto> getAll() {
-		return StreamSupport.stream(peopleRepository.findAll().spliterator(), false)
+		return StreamSupport.stream(
+				peopleRepository.findAllByOrderBySurnameAscNameAsc().spliterator(), false)
 				.map(PeopleNameDto::new)
 				.collect(Collectors.toList());
 	}
