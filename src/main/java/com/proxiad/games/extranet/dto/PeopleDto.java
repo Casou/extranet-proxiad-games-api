@@ -1,6 +1,8 @@
 package com.proxiad.games.extranet.dto;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.proxiad.games.extranet.enums.LanguageEnum;
@@ -30,5 +32,6 @@ public class PeopleDto {
 	private Set<String> interets;
 
 	private Integer age;
+	private Map<String, List<String>> skillMap;
 
 }

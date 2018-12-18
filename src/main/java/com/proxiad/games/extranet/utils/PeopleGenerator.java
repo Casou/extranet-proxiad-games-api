@@ -29,20 +29,25 @@ public class PeopleGenerator {
 			"Bénévolat", "Poker", "Barbecue", "Dessin", "Peinture", "Karaoké", "Billard", "Babyfoot", "Fléchettes",
 			"Danse", "Concerts", "Musée", "Poterie", "Modélisme", "Philatélie", "Cosplay", "Couture", "Tricot");
 
+	private static Map<String, List<String>> SKILLS = new HashMap<>();
+
 	private LocalDateTime birthdayMinDate;
 	private LocalDateTime arrivalMaxDate;
 
 	PeopleGenerator() {
 		this.birthdayMinDate = LocalDateTime.of(1975, Month.JANUARY, 1, 0, 0);
 		this.arrivalMaxDate = LocalDateTime.now().minusMonths(3);
+		initSkillsMap();
 	}
 
-	public static void main(String[] args) {
-		PeopleGenerator generator = new PeopleGenerator();
-		generator.generatePeople(20)
-		.forEach(System.out::println);
+	private void initSkillsMap() {
+		SKILLS.put("Backend Technology", Arrays.asList("Spring", "Spring Boot", "Hibernate", "Struts", "Maven"));
+		SKILLS.put("Frontend Technology", Arrays.asList("React", "Angular", "AngularJS", "Ember", "Vue.js", "Node", "Bootstrap", "Webpack", "Babel"));
+		SKILLS.put("Databases and Server", Arrays.asList("Oracle", "Postgresql", "MySQL", "H2", "Nosql", "Plex", "Oracle Applications", "Firebase"));
+		SKILLS.put("Integration tools", Arrays.asList("Jenkins", "Hudson", "Nexus"));
+		SKILLS.put("Graphical tools", Arrays.asList("Gimp", "Photoshop", "Illustrator", "InDesign", "Lightroom", "Affinity", "After Effect"));
+		SKILLS.put("Methodology", Arrays.asList("Agile", "ITIL", "Lean", "Extreme programming", "Crystal programming", "SAFe"));
 	}
-
 
 	public List<People> generatePeople(Integer nbPeople) {
 		File firstNameReferential = new File(PeopleReferentialGenerator.FIRSTNAME_REFERENTIAL);
@@ -72,6 +77,7 @@ public class PeopleGenerator {
 			people.setPictureIndex((int) Math.round(Math.random() * (MAP_MAX_PICTURE_INDEX_BY_SEX.get(people.getSex()) - 1)) + 1);
 			people.setLanguages(generateLanguages());
 			people.setInterets(generateInterets());
+			people.setSkills(generateSkills());
 
 			peoples.add(people);
 		});
@@ -106,7 +112,7 @@ public class PeopleGenerator {
 	private Set<LanguageEnum> generateLanguages() {
 		Set<LanguageEnum> languages = new HashSet<>();
 		languages.add(LanguageEnum.FRANCAIS);
-		while (Math.random() > 0.5 && languages.size() <= 4) {
+		while (Math.random() > 0.5 && languages.size() <= 3) {
 			languages.add(LanguageEnum.list().get((int) Math.round(Math.random() * (LanguageEnum.list().size() - 1))));
 		}
 		return languages;
@@ -118,6 +124,21 @@ public class PeopleGenerator {
 			interets.add(INTERETS.get((int) Math.round(Math.random() * (INTERETS.size() - 1))));
 		}
 		return interets;
+	}
+
+	private Map<String, String> generateSkills() {
+		Map<String, String> skills = new HashMap<>();
+
+		IntStream.range(0, 3).forEach(idx -> {
+			Map.Entry<String, List<String>> skill = CollectionUtils.random(SKILLS.entrySet());
+			skills.put(skill.getKey(),
+					CollectionUtils.random(skill.getValue(), 2 + (int) Math.round(Math.random() * 3)) // 2-4 skills by domain
+						.stream()
+						.distinct()
+						.collect(Collectors.joining(",")));
+		});
+
+		return skills;
 	}
 
 	private class NameRef {

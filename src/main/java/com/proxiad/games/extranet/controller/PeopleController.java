@@ -1,6 +1,7 @@
 package com.proxiad.games.extranet.controller;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -46,6 +47,8 @@ public class PeopleController {
 
 		PeopleDto dto = mapper.map(people, PeopleDto.class);
 		dto.setAge(DateUtils.calculateAge(people.getBirthDate().toLocalDate(), LocalDateTime.now().toLocalDate()));
+		dto.setSkillMap(people.getSkills().entrySet().stream()
+			.collect(Collectors.toMap(entry -> entry.getKey(), entry -> Arrays.asList(entry.getValue().split(",")))));
 		return dto;
 	}
 

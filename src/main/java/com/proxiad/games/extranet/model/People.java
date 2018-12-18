@@ -2,6 +2,7 @@ package com.proxiad.games.extranet.model;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Set;
 
 import org.springframework.lang.NonNull;
@@ -47,5 +48,10 @@ public class People {
 
 	@ElementCollection
 	private Set<String> interets;
+
+	@ElementCollection // this is a collection of primitives
+	@MapKeyColumn(name="domain") // column name for map "key"
+	@Column(name="skill") // column name for map "value"
+	private Map<String, String> skills;
 
 }
