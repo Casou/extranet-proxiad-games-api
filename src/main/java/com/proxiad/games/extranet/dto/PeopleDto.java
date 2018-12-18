@@ -1,10 +1,7 @@
-package com.proxiad.games.extranet.model;
+package com.proxiad.games.extranet.dto;
 
-import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Set;
-
-import org.springframework.lang.NonNull;
 
 import com.proxiad.games.extranet.enums.LanguageEnum;
 
@@ -14,38 +11,24 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Entity
-@Table(name="people")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class People {
+public class PeopleDto {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer id;
-
-	@NonNull
 	private String name;
-
-	@NonNull
 	private String surname;
-
 	private Integer sex;
-
 	private LocalDateTime birthDate;
 	private LocalDateTime arrivalDate;
 	private String email;
 	private String phone;
 	private String city;
 	private Integer pictureIndex;
-
-	@Column(name = "languages")
-	@ElementCollection
-	@Enumerated(EnumType.STRING)
 	private Set<LanguageEnum> languages;
-
-	@ElementCollection
 	private Set<String> interets;
+
+	private Integer age;
 
 }

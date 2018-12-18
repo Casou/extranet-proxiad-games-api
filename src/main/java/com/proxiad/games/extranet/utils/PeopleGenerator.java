@@ -9,6 +9,7 @@ import java.util.stream.IntStream;
 
 import org.springframework.stereotype.Component;
 
+import com.proxiad.games.extranet.enums.LanguageEnum;
 import com.proxiad.games.extranet.model.People;
 
 import lombok.Getter;
@@ -20,15 +21,13 @@ public class PeopleGenerator {
 		put(1, 26);
 		put(2, 26);
 	}};
-	private static final List<String> CITIES = Arrays.asList("Lille",
-			"Paris",
-			"Bordeaux",
-			"Nantes",
-			"Rouen",
-			"Aix en Provence",
-			"Bulgarie",
-			"Strasbourg",
-			"Lyon");
+	private static final List<String> CITIES = Arrays.asList("Lille", "Paris", "Bordeaux", "Nantes", "Rouen",
+			"Aix en Provence", "Bulgarie", "Strasbourg", "Lyon");
+
+	private static final List<String> INTERETS = Arrays.asList("Badminton", "Volley", "Football", "Echecs", "Jeux de société", "Photographie",
+			"Musique", "Cinéma", "Voyages", "Livres", "Jeux vidéos", "Escalade", "Cuisine", "TCG", "Comics",
+			"Bénévolat", "Poker", "Barbecue", "Dessin", "Peinture", "Karaoké", "Billard", "Babyfoot", "Fléchettes",
+			"Danse", "Concerts", "Musée", "Poterie", "Modélisme", "Philatélie", "Cosplay", "Couture", "Tricot");
 
 	private LocalDateTime birthdayMinDate;
 	private LocalDateTime arrivalMaxDate;
@@ -59,8 +58,8 @@ public class PeopleGenerator {
 
 		IntStream.range(0, nbPeople).forEach(idx -> {
 			People people = new People();
-			FirstNameRef firstName = flatFirstNameRef.get((int) Math.round(Math.random() * flatFirstNameRef.size()));
-			SurnameRef surname = flatSurnameRef.get((int) Math.round(Math.random() * flatFirstNameRef.size()));
+			FirstNameRef firstName = flatFirstNameRef.get((int) Math.round(Math.random() * (flatFirstNameRef.size() - 1)));
+			SurnameRef surname = flatSurnameRef.get((int) Math.round(Math.random() * (flatFirstNameRef.size() - 1)));
 
 			people.setSex(firstName.getSex());
 			people.setName(StringUtils.capitalize(firstName.getName()));
@@ -70,7 +69,9 @@ public class PeopleGenerator {
 			people.setBirthDate(generateBirthdayDate());
 			people.setArrivalDate(generateArrivalDate());
 			people.setCity(CITIES.get((int) Math.floor(Math.random() * CITIES.size())));
-			people.setPictureIndex((int) Math.round(Math.random() * MAP_MAX_PICTURE_INDEX_BY_SEX.get(people.getSex())));
+			people.setPictureIndex((int) Math.round(Math.random() * (MAP_MAX_PICTURE_INDEX_BY_SEX.get(people.getSex()) - 1)) + 1);
+			people.setLanguages(generateLanguages());
+			people.setInterets(generateInterets());
 
 			peoples.add(people);
 		});
@@ -100,6 +101,23 @@ public class PeopleGenerator {
 
 	private LocalDateTime generateArrivalDate() {
 		return this.arrivalMaxDate.minusDays(Math.round(Math.random() * 365 * 15));
+	}
+
+	private Set<LanguageEnum> generateLanguages() {
+		Set<LanguageEnum> languages = new HashSet<>();
+		languages.add(LanguageEnum.FRANCAIS);
+		while (Math.random() > 0.5 && languages.size() <= 4) {
+			languages.add(LanguageEnum.list().get((int) Math.round(Math.random() * (LanguageEnum.list().size() - 1))));
+		}
+		return languages;
+	}
+
+	private Set<String> generateInterets() {
+		Set<String> interets = new HashSet<>();
+		while (Math.random() > 0.65 && interets.size() <= 6) {
+			interets.add(INTERETS.get((int) Math.round(Math.random() * (INTERETS.size() - 1))));
+		}
+		return interets;
 	}
 
 	private class NameRef {
