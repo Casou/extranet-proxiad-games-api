@@ -40,6 +40,7 @@ public class People {
 	private String phone;
 	private String city;
 	private Integer pictureIndex;
+	private String workPlace;
 
 	@Column(name = "languages")
 	@ElementCollection

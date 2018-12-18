@@ -29,6 +29,12 @@ public class PeopleGenerator {
 			"Bénévolat", "Poker", "Barbecue", "Dessin", "Peinture", "Karaoké", "Billard", "Babyfoot", "Fléchettes",
 			"Danse", "Concerts", "Musée", "Poterie", "Modélisme", "Philatélie", "Cosplay", "Couture", "Tricot");
 
+	private static final List<String> CLIENTS = Arrays.asList("Orange (Lille)", "Orange (V2)", "JCDecaux", "Technip", "Auchan",
+			"Europcar", "MAE", "Cofidis", "Antargaz", "Boursorama", "Crédit agricole", "Natixis", "Société générale", "SNCF",
+			"Maif", "MGEN", "Adeo", "Leroy Merlin", "Easy Voyage", "Banque Accor", "Dexia", "Axa", "Ferrero", "Caisse d'épargne",
+			"Airfrance", "Alstom", "Humanis", "Groupama", "SAP", "BNP", "AG2R", "Ariba", "France Television", "GSK", "Banque Populaire",
+			"Pay-on", "Illicado", "Harmonie mutuelle");
+
 	private static Map<String, List<String>> SKILLS = new HashMap<>();
 
 	private LocalDateTime birthdayMinDate;
@@ -66,6 +72,11 @@ public class PeopleGenerator {
 			FirstNameRef firstName = flatFirstNameRef.get((int) Math.round(Math.random() * (flatFirstNameRef.size() - 1)));
 			SurnameRef surname = flatSurnameRef.get((int) Math.round(Math.random() * (flatFirstNameRef.size() - 1)));
 
+			while (alreadyExist(peoples, surname.getName(), firstName.getName())) {
+				firstName = flatFirstNameRef.get((int) Math.round(Math.random() * (flatFirstNameRef.size() - 1)));
+				surname = flatSurnameRef.get((int) Math.round(Math.random() * (flatFirstNameRef.size() - 1)));
+			}
+
 			people.setSex(firstName.getSex());
 			people.setName(StringUtils.capitalize(firstName.getName()));
 			people.setSurname(StringUtils.capitalize(surname.getName()));
@@ -78,11 +89,16 @@ public class PeopleGenerator {
 			people.setLanguages(generateLanguages());
 			people.setInterets(generateInterets());
 			people.setSkills(generateSkills());
+			people.setWorkPlace(CollectionUtils.random(CLIENTS));
 
 			peoples.add(people);
 		});
 
 		return peoples;
+	}
+
+	private boolean alreadyExist(List<People> peoples, String surname, String firstName) {
+		return peoples.stream().anyMatch(p -> p.getSurname().equals(surname) && p.getName().equals(firstName));
 	}
 
 	private List<? extends NameRef> flatFirstNameList(List<? extends NameRef> firstNameForOneSex) {
@@ -120,7 +136,7 @@ public class PeopleGenerator {
 
 	private Set<String> generateInterets() {
 		Set<String> interets = new HashSet<>();
-		while (Math.random() > 0.65 && interets.size() <= 6) {
+		while (Math.random() > 0.35 && interets.size() < 6) {
 			interets.add(INTERETS.get((int) Math.round(Math.random() * (INTERETS.size() - 1))));
 		}
 		return interets;

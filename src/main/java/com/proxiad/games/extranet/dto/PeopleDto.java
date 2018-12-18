@@ -30,6 +30,7 @@ public class PeopleDto {
 	private Integer pictureIndex;
 	private Set<LanguageEnum> languages;
 	private Set<String> interets;
+	private String workPlace;
 
 	private Integer age;
 	private Map<String, List<String>> skillMap;
