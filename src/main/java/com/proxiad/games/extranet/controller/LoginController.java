@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.proxiad.games.extranet.annotation.BypassSecurity;
 import com.proxiad.games.extranet.dto.LoginAccessDto;
 import com.proxiad.games.extranet.dto.PasswordDto;
 import com.proxiad.games.extranet.model.Token;
@@ -24,6 +25,7 @@ public class LoginController {
 	private TokenRepository tokenRepository;
 
 	@PostMapping("/login")
+	@BypassSecurity
 	public ResponseEntity<?> login(@RequestBody PasswordDto passwordDto) {
 		if (passwordDto == null || passwordDto.getPassword() == null ||
 				!passwordDto.getPassword().toLowerCase().equals(goodPassword)) {

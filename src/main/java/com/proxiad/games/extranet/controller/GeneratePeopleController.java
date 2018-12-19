@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.proxiad.games.extranet.annotation.AdminTokenSecurity;
 import com.proxiad.games.extranet.model.People;
 import com.proxiad.games.extranet.service.PeopleService;
 
@@ -19,6 +20,7 @@ public class GeneratePeopleController {
 	private PeopleService peopleService;
 
 	@GetMapping("/admin/generatePeople/{number}")
+	@AdminTokenSecurity
 	public ResponseEntity<?> generatePeople(@PathVariable("number") Integer numberOfPeople) {
 		List<People> people = peopleService.generateRandomPeople(numberOfPeople);
 		peopleService.generateIAEntry();
