@@ -8,6 +8,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -16,6 +18,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.filter.GenericFilterBean;
 import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import com.proxiad.games.extranet.annotation.AdminTokenSecurity;
@@ -38,14 +41,16 @@ public class JWTFilter extends GenericFilterBean {
 
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse res, FilterChain filterChain) throws IOException, ServletException {
-		HttpServletRequest request = (HttpServletRequest) req;
-		HttpServletResponse response = (HttpServletResponse) res;
-		String token = request.getHeader("Authorization");
+		final HttpServletRequest request = (HttpServletRequest) req;
+		final HttpServletResponse response = (HttpServletResponse) res;
+		final String token = request.getHeader("Authorization");
 
-		HandlerMethod handlerMethod = handlerMapping.getHandlerMethods().entrySet().stream()
-				.filter(entry -> URIPatternMatchers.matches(request.getRequestURI(), entry.getKey().getPatternsCondition().getPatterns().iterator().next()))
-				.collect(Collectors.toList())
-				.get(0).getValue();
+		final String uri = request.getRequestURI();
+
+		List<Map.Entry<RequestMappingInfo, HandlerMethod>> filteredMethods = handlerMapping.getHandlerMethods().entrySet().stream()
+				.filter(entry -> URIPatternMatchers.matches(uri, entry.getKey().getPatternsCondition().getPatterns().iterator().next()))
+				.collect(Collectors.toList());
+		HandlerMethod handlerMethod = filteredMethods.size() > 0 ? filteredMethods.get(0).getValue() : null;
 
 		if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
 			response.sendError(HttpServletResponse.SC_OK, "success");
@@ -79,14 +84,13 @@ public class JWTFilter extends GenericFilterBean {
 		tokenEntity.setExpirationDate(LocalDateTime.now().plusHours(1));
 		tokenRepository.save(tokenEntity);
 
-//				ObjectId userId = new ObjectId(tokenService.getUserIdFromToken(token));
-//				request.setAttribute("userId", "test");
+		request.setAttribute("token", token);
 
 		filterChain.doFilter(req, res);
 	}
 
 	private boolean allowRequestWithSpecialToken(HandlerMethod handlerMethod, String tokenString) {
-		if (handlerMethod.getMethodAnnotation(AdminTokenSecurity.class) != null) {
+		if (handlerMethod != null && handlerMethod.getMethodAnnotation(AdminTokenSecurity.class) != null) {
 			return tokenString.equals(adminToken);
 		}
 
@@ -98,7 +102,7 @@ public class JWTFilter extends GenericFilterBean {
 	}
 
 	private boolean allowRequestWithoutToken(HttpServletRequest request, HandlerMethod handlerMethod) {
-		return request.getRequestURI().contains("/console") || handlerMethod.getMethodAnnotation(BypassSecurity.class) != null;
+		return request.getRequestURI().contains("/console") || (handlerMethod != null && handlerMethod.getMethodAnnotation(BypassSecurity.class) != null);
 	}
 
 }
