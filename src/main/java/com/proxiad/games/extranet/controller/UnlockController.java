@@ -20,7 +20,7 @@ public class UnlockController {
 	@Autowired
 	private UnlockedRiddleRepository unlockedRiddleRepository;
 
-	private static final Map<String, String> RIDDLE_RESPONSES = new HashMap<String, String>() {{
+	public static final Map<String, String> RIDDLE_RESPONSES = new HashMap<String, String>() {{
 		put("riddle1", "abcde");
 		put("riddle2", "zzzzz");
 		put("riddle3", "aaaaa");
