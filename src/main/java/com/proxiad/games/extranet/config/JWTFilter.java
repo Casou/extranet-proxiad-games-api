@@ -7,7 +7,6 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -23,15 +22,15 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 
 import com.proxiad.games.extranet.annotation.AdminTokenSecurity;
 import com.proxiad.games.extranet.annotation.BypassSecurity;
-import com.proxiad.games.extranet.model.Token;
-import com.proxiad.games.extranet.repository.TokenRepository;
+import com.proxiad.games.extranet.dto.TokenDto;
+import com.proxiad.games.extranet.service.AuthService;
 import com.proxiad.games.extranet.utils.URIPatternMatchers;
 
 @Configuration
 public class JWTFilter extends GenericFilterBean {
 
 	@Autowired
-	private TokenRepository tokenRepository;
+	private AuthService authService;
 
 	@Autowired
 	private RequestMappingHandlerMapping handlerMapping;
@@ -43,19 +42,22 @@ public class JWTFilter extends GenericFilterBean {
 	public void doFilter(ServletRequest req, ServletResponse res, FilterChain filterChain) throws IOException, ServletException {
 		final HttpServletRequest request = (HttpServletRequest) req;
 		final HttpServletResponse response = (HttpServletResponse) res;
-		final String token = request.getHeader("Authorization");
+		String token = request.getHeader("Authorization");
+		if (token == null && request.getParameter("token") != null) {
+			token = request.getParameter("token");
+		}
 
 		final String uri = request.getRequestURI();
-
-		List<Map.Entry<RequestMappingInfo, HandlerMethod>> filteredMethods = handlerMapping.getHandlerMethods().entrySet().stream()
-				.filter(entry -> URIPatternMatchers.matches(uri, entry.getKey().getPatternsCondition().getPatterns().iterator().next()))
-				.collect(Collectors.toList());
-		HandlerMethod handlerMethod = filteredMethods.size() > 0 ? filteredMethods.get(0).getValue() : null;
 
 		if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
 			response.sendError(HttpServletResponse.SC_OK, "success");
 			return;
 		}
+
+		List<Map.Entry<RequestMappingInfo, HandlerMethod>> filteredMethods = handlerMapping.getHandlerMethods().entrySet().stream()
+				.filter(entry -> URIPatternMatchers.matches(uri, entry.getKey().getPatternsCondition().getPatterns().iterator().next()))
+				.collect(Collectors.toList());
+		HandlerMethod handlerMethod = filteredMethods.size() > 0 ? filteredMethods.get(0).getValue() : null;
 
 		if (allowRequestWithoutToken(request, handlerMethod)) {
 			response.setStatus(HttpServletResponse.SC_OK);
@@ -74,15 +76,11 @@ public class JWTFilter extends GenericFilterBean {
 			return;
 		}
 
-		Optional<Token> optionalToken = this.tokenRepository.findById(token);
-		if (!optionalToken.isPresent() || !isTokenValid(optionalToken.get())) {
+		Optional<TokenDto> optionalToken = this.authService.validateToken(token);
+		if (!optionalToken.isPresent()) {
 			response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
 			return;
 		}
-
-		Token tokenEntity = optionalToken.get();
-		tokenEntity.setExpirationDate(LocalDateTime.now().plusHours(1));
-		tokenRepository.save(tokenEntity);
 
 		request.setAttribute("token", token);
 
@@ -97,12 +95,10 @@ public class JWTFilter extends GenericFilterBean {
 		return false;
 	}
 
-	private boolean isTokenValid(Token token) {
-		return token.getExpirationDate().isAfter(LocalDateTime.now());
-	}
-
 	private boolean allowRequestWithoutToken(HttpServletRequest request, HandlerMethod handlerMethod) {
-		return request.getRequestURI().contains("/console") || (handlerMethod != null && handlerMethod.getMethodAnnotation(BypassSecurity.class) != null);
+		return request.getRequestURI().contains("/console")
+				|| request.getRequestURI().contains("/ws")
+				|| (handlerMethod != null && handlerMethod.getMethodAnnotation(BypassSecurity.class) != null);
 	}
 
 }
