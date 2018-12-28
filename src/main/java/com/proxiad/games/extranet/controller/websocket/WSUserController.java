@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.proxiad.games.extranet.annotation.BypassSecurity;
+import com.proxiad.games.extranet.annotation.AdminTokenSecurity;
 import com.proxiad.games.extranet.dto.TerminalCommandDto;
 import com.proxiad.games.extranet.dto.TokenDto;
 import com.proxiad.games.extranet.dto.UserSessionDto;
@@ -22,7 +22,7 @@ public class WSUserController {
 	private static final Map<String, UserSessionDto> CONNECTED_USERS_TOKEN = new HashMap<>();
 
 	@GetMapping("/connectedUsers")
-	@BypassSecurity
+	@AdminTokenSecurity
 	public List<UserSessionDto> listConnectedUsers() {
 		return CONNECTED_USERS_TOKEN.values().stream()
 				.filter(UserSessionDto::getIsConnected)
@@ -30,7 +30,7 @@ public class WSUserController {
 	}
 
 	@GetMapping("/users")
-	@BypassSecurity
+	@AdminTokenSecurity
 	public List<UserSessionDto> listAllUsers() {
 		return new ArrayList<>(CONNECTED_USERS_TOKEN.values());
 	}

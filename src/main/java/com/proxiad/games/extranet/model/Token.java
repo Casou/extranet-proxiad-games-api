@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 
 @Data
 @Entity
@@ -16,13 +17,18 @@ public class Token {
 
 	@Id
 	private String token;
+	@NonNull
+	private String roomName;
+	@NonNull
 	private LocalDateTime expirationDate;
 
-	public Token(String token) {
-		this(token, LocalDateTime.now().plusHours(1));
+//	private List<UnlockedRiddle> unlockedRiddles;
+
+	public Token(String token, String userName) {
+		this(token, userName, LocalDateTime.now().plusHours(1));
 	}
 
-	public Token(String token, LocalDateTime expirationDate) {
+	public Token(String token, String userName, LocalDateTime expirationDate) {
 		this.token = token;
 		this.expirationDate = expirationDate;
 	}
