@@ -1,8 +1,6 @@
 package com.proxiad.games.extranet.model;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
 import lombok.Data;
@@ -22,13 +20,15 @@ public class Token {
 	@NonNull
 	private LocalDateTime expirationDate;
 
-//	private List<UnlockedRiddle> unlockedRiddles;
+//	@OneToOne(fetch = FetchType.LAZY)
+//	@JoinColumn(name = "room_id")
+//	private Room room;
 
-	public Token(String token, String userName) {
-		this(token, userName, LocalDateTime.now().plusHours(1));
+	public Token(String token) {
+		this(token, LocalDateTime.now().plusHours(1));
 	}
 
-	public Token(String token, String userName, LocalDateTime expirationDate) {
+	public Token(String token, LocalDateTime expirationDate) {
 		this.token = token;
 		this.expirationDate = expirationDate;
 	}

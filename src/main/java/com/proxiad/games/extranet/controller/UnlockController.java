@@ -3,12 +3,14 @@ package com.proxiad.games.extranet.controller;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.proxiad.games.extranet.dto.UnlockDto;
 import com.proxiad.games.extranet.model.UnlockedRiddle;
@@ -26,15 +28,8 @@ public class UnlockController {
 		put("riddle3", "aaaaa");
 	}};
 
-	@GetMapping("/unlock/status")
-	public List<String> getUnlockStatus(@RequestAttribute String token) {
-		return unlockedRiddleRepository.findByTokenUser(token).stream()
-				.map(UnlockedRiddle::getRiddleId)
-				.collect(Collectors.toList());
-	}
-
 	@PostMapping("/unlock")
-	public ResponseEntity<?> unlockBolt(@RequestBody UnlockDto unlockDto, @RequestAttribute String token) {
+	public ResponseEntity<?> unlockRiddle(@RequestBody UnlockDto unlockDto, @RequestAttribute String token) {
 		if (!RIDDLE_RESPONSES.containsKey(unlockDto.getId()) || !RIDDLE_RESPONSES.get(unlockDto.getId()).equals(unlockDto.getPassword())){
 			return new ResponseEntity<>("Id and password don't match.", HttpStatus.FORBIDDEN);
 		}

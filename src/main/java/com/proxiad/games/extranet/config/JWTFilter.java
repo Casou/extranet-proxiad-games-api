@@ -23,6 +23,7 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 import com.proxiad.games.extranet.annotation.AdminTokenSecurity;
 import com.proxiad.games.extranet.annotation.BypassSecurity;
 import com.proxiad.games.extranet.dto.TokenDto;
+import com.proxiad.games.extranet.repository.RoomRepository;
 import com.proxiad.games.extranet.service.AuthService;
 import com.proxiad.games.extranet.utils.URIPatternMatchers;
 
@@ -31,6 +32,9 @@ public class JWTFilter extends GenericFilterBean {
 
 	@Autowired
 	private AuthService authService;
+
+	@Autowired
+	private RoomRepository roomRepository;
 
 	@Autowired
 	private RequestMappingHandlerMapping handlerMapping;
@@ -83,6 +87,7 @@ public class JWTFilter extends GenericFilterBean {
 		}
 
 		request.setAttribute("token", token);
+		request.setAttribute("room", roomRepository.findByToken(token));
 
 		filterChain.doFilter(req, res);
 	}
