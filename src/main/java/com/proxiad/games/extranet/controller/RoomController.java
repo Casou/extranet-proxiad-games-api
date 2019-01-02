@@ -19,6 +19,7 @@ import com.proxiad.games.extranet.repository.RoomRepository;
 import com.proxiad.games.extranet.service.RoomService;
 
 @RestController
+@CrossOrigin
 public class RoomController {
 
 	@Autowired
@@ -48,6 +49,15 @@ public class RoomController {
 		return roomService.findAll();
 	}
 
+	@PutMapping(value = "/room")
+	@AdminTokenSecurity
+	public ResponseEntity<?> newRoom() {
+		Room room = new Room();
+		room.setName("Nouveau");
+		roomRepository.save(room);
+
+		return new ResponseEntity<>(room, HttpStatus.OK);
+	}
 
 	@PostMapping(value = "/room/{id}/name")
 	@AdminTokenSecurity
@@ -62,6 +72,7 @@ public class RoomController {
 		room.setName(updatedRoom.getName());
 		roomRepository.save(room);
 
-		return new ResponseEntity<>("ok", HttpStatus.OK);
+		return new ResponseEntity<>(room, HttpStatus.OK);
 	}
+
 }
