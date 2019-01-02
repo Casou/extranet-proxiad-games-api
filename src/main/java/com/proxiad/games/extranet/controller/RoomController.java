@@ -75,4 +75,18 @@ public class RoomController {
 		return new ResponseEntity<>(room, HttpStatus.OK);
 	}
 
+	@DeleteMapping(value = "/room/{id}")
+	@AdminTokenSecurity
+	public ResponseEntity<?> deleteRoom(@PathVariable("id") Integer id) {
+		Optional<Room> optRoom = roomRepository.findById(id);
+
+		if (!optRoom.isPresent()) {
+			return new ResponseEntity<>("No room with id " + id, HttpStatus.BAD_REQUEST);
+		}
+
+		roomRepository.delete(optRoom.get());
+
+		return new ResponseEntity<>("deleted", HttpStatus.OK);
+	}
+
 }
