@@ -80,8 +80,8 @@ public class WSClientController {
 		});
 	}
 
-	public void roomConnected(String room, String sessionId) {
-		Optional<Room> optRoom = roomRepository.findByNameIgnoreCase(room);
+	public void roomConnected(Integer roomId, String sessionId) {
+		Optional<Room> optRoom = roomRepository.findById(roomId);
 
 		optRoom.ifPresent(roomEntity -> {
 			RoomSessionDto roomSessionDto = RoomSessionDto.builder()

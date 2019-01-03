@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.support.GenericMessage;
+import org.springframework.util.StringUtils;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
@@ -81,9 +82,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 			return;
 		}
 
-		String room = (String) roomHeaderList.get().get(0);
-		if (room != null && sessionId != null) {
-			wsUserController.roomConnected(room, sessionId);
+		String roomId = (String) roomHeaderList.get().get(0);
+		if (!StringUtils.isEmpty(roomId) && sessionId != null) {
+			wsUserController.roomConnected(Integer.valueOf(roomId), sessionId);
 		}
 	}
 
