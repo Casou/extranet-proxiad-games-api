@@ -15,7 +15,7 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 import org.springframework.web.socket.messaging.SessionConnectEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
-import com.proxiad.games.extranet.controller.websocket.WSUserController;
+import com.proxiad.games.extranet.controller.websocket.WSClientController;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,7 +28,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 	private WebSocketHandshakeInterceptor webSocketHandshakeInterceptor;
 
 	@Autowired
-	private WSUserController wsUserController;
+	private WSClientController wsUserController;
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
@@ -45,6 +45,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 		GenericMessage message = (GenericMessage) event.getMessage();
 
 		MessageHeaders headers = message.getHeaders();
+		String sessionId = (String) headers.get("simpSessionId");
 		if (headers == null) {
 			log.info("Received a new web socket connection (no header) : " + event);
 		}
@@ -54,24 +55,45 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 			log.info("Received a new web socket connection (no native header) : " + event);
 		}
 
-		Optional<List> authorizationHeaderList = Optional.of((List) nativeHeaders.get().get("Authorization"));
+		checkToken(event, sessionId, nativeHeaders.get());
+		checkRoomToken(event, sessionId, nativeHeaders.get());
+
+		log.info("Received a new web socket connection from [" + sessionId + "] : " + event);
+	}
+
+	private void checkToken(SessionConnectEvent event, String sessionId, Map nativeHeaders) {
+		Optional<List> authorizationHeaderList = Optional.ofNullable((List) nativeHeaders.get("Authorization"));
 		if (!authorizationHeaderList.isPresent()) {
 			log.info("Received a new web socket connection (no authorization in native header) : " + event);
+			return;
 		}
 
 		String token = (String) authorizationHeaderList.get().get(0);
-		String sessionId = (String) headers.get("simpSessionId");
 		if (token != null && sessionId != null) {
 			wsUserController.userConnected(token, sessionId);
 		}
-		log.info("Received a new web socket connection from [" + token + ", " + sessionId + "] : " + event);
+	}
+
+	private void checkRoomToken(SessionConnectEvent event, String sessionId, Map nativeHeaders) {
+		Optional<List> roomHeaderList = Optional.ofNullable((List) nativeHeaders.get("Room"));
+		if (!roomHeaderList.isPresent()) {
+			log.info("Received a new web socket connection (no authorization in native header) : " + event);
+			return;
+		}
+
+		String room = (String) roomHeaderList.get().get(0);
+		if (room != null && sessionId != null) {
+			wsUserController.roomConnected(room, sessionId);
+		}
 	}
 
 	@EventListener(SessionDisconnectEvent.class)
 	public void handleWebsocketDisconnectListner(SessionDisconnectEvent event) {
-		String token = wsUserController.userDisconnected(event.getSessionId());
+		Optional<String> optToken = wsUserController.userDisconnected(event.getSessionId());
+		optToken.ifPresent(token -> log.info("User disconnected [" + optToken + ", " + event.getSessionId() + "] : " + event));
 
-		log.info("User disconnected [" + token + ", " + event.getSessionId() + "] : " + event);
+		Optional<String> optRoom = wsUserController.roomDisconnected(event.getSessionId());
+		optRoom.ifPresent(room -> log.info("Room disconnected [" + room + ", " + event.getSessionId() + "] : " + event));
 	}
 
 }

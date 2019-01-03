@@ -15,7 +15,7 @@ public interface RoomRepository extends CrudRepository<Room, Integer> {
 
 	List<Room> findAll();
 
-	Optional<Room> findByName(String name);
+	Optional<Room> findByNameIgnoreCase(String name);
 
 	@Query("Select r from Room r where r.connectedToken.token = :token")
 	Optional<Room> findByToken(@Param("token") String token);

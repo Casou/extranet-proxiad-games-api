@@ -28,9 +28,6 @@ public class LoginController {
 	@Value("${extranet.password}")
 	private String goodPassword;
 
-	@Value("${extranet.rooms}")
-	private String rooms;
-
 	@Autowired
 	private TokenRepository tokenRepository;
 
@@ -45,7 +42,7 @@ public class LoginController {
 			return new ResponseEntity<>("Missing argument(s)", HttpStatus.BAD_REQUEST);
 		}
 
-		Optional<Room> optRoom = roomRepository.findByName(StringUtils.capitalize(loginDto.getLogin()));
+		Optional<Room> optRoom = roomRepository.findByNameIgnoreCase(StringUtils.capitalize(loginDto.getLogin()));
 		if (isEmpty(loginDto.getPassword())
 				|| !optRoom.isPresent()
 				|| !loginDto.getPassword().toLowerCase().equals(goodPassword)) {

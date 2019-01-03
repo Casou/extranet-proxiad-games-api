@@ -19,7 +19,7 @@ public class TerminalWSController {
 	private AuthService authService;
 
 	@Autowired
-	private WSUserController wsUserController;
+	private WSClientController wsUserController;
 
 	@MessageMapping("/terminalCommand")
 	@SendTo("/topic/terminalCommand")
