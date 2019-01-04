@@ -9,6 +9,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.proxiad.games.extranet.dto.RoomDto;
+import com.proxiad.games.extranet.dto.RoomMessageDto;
 import com.proxiad.games.extranet.exception.ProxiadControllerException;
 import com.proxiad.games.extranet.model.Room;
 import com.proxiad.games.extranet.repository.RoomRepository;
@@ -40,6 +41,11 @@ public class RoomWSController {
 		roomRepository.save(room);
 
 		this.simpMessagingTemplate.convertAndSend("/topic/room/all/startTimer", room);
+	}
+
+	@MessageMapping("/room/message")
+	public void sendMessage(RoomMessageDto messageDto) throws ProxiadControllerException {
+		this.simpMessagingTemplate.convertAndSend("/topic/room/" + messageDto.getRoom().getId() + "/message", messageDto);
 	}
 
 }
