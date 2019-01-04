@@ -1,7 +1,6 @@
 package com.proxiad.games.extranet.model;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +29,8 @@ public class Room {
 	@ElementCollection(fetch =  FetchType.EAGER)
 	private List<Integer> resolvedRiddleIds = new ArrayList<>();
 
-	private LocalDateTime startTime;
+	@OneToOne(fetch = FetchType.EAGER, cascade=CascadeType.ALL)
+	@JoinColumn(name = "timer_id")
+	private Timer timer;
 
 }

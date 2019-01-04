@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.proxiad.games.extranet.enums.TimerStatusEnum;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,6 +19,9 @@ public class RoomDto {
 	private String name;
 	private String token;
 	private List<Integer> resolvedRiddleIds = new ArrayList<>();
+
+	private TimerStatusEnum statusTime;
 	private LocalDateTime startTime;
+	private Integer remainingTime;
 
 }

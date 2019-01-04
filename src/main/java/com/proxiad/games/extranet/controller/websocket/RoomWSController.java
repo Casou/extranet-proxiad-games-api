@@ -1,6 +1,7 @@
 package com.proxiad.games.extranet.controller.websocket;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,8 +11,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.proxiad.games.extranet.dto.RoomDto;
 import com.proxiad.games.extranet.dto.RoomMessageDto;
+import com.proxiad.games.extranet.enums.TimerStatusEnum;
 import com.proxiad.games.extranet.exception.ProxiadControllerException;
 import com.proxiad.games.extranet.model.Room;
+import com.proxiad.games.extranet.model.Timer;
 import com.proxiad.games.extranet.repository.RoomRepository;
 
 @RestController
@@ -24,23 +27,58 @@ public class RoomWSController {
 	private RoomRepository roomRepository;
 
 	@MessageMapping("/room/start")
-	public void start(RoomDto roomDto) {
+	public void start(RoomDto roomDto) throws ProxiadControllerException {
+		final Room room = getRoom(roomDto);
+
+		final Timer timer = Optional.ofNullable(room.getTimer()).orElse(new Timer());
+		timer.setRemainingTime(roomDto.getRemainingTime());
+		room.setTimer(timer);
+		roomRepository.save(room);
+
 		this.simpMessagingTemplate.convertAndSend("/topic/room/all/start", roomDto);
 		this.simpMessagingTemplate.convertAndSend("/topic/room/" + roomDto.getId() + "/start", roomDto);
 	}
 
 	@MessageMapping("/room/startTimer")
 	public void startTimer(RoomDto roomDto) throws ProxiadControllerException {
-		Optional<Room> optRoom = roomRepository.findById(roomDto.getId());
-		if (!optRoom.isPresent()) {
-			throw new ProxiadControllerException("Room " + roomDto.getId() + " doesn't exists");
-		}
+		final Room room = getRoom(roomDto);
 
-		Room room = optRoom.get();
-		room.setStartTime(LocalDateTime.now());
+		final Timer timer = Optional.ofNullable(room.getTimer()).orElseThrow(() -> new ProxiadControllerException("No timer found for the room " + room.getName()));
+		timer.setStartTime(LocalDateTime.now());
+		timer.setStatus(TimerStatusEnum.STARTED);
+		room.setTimer(timer);
 		roomRepository.save(room);
 
 		this.simpMessagingTemplate.convertAndSend("/topic/room/all/startTimer", room);
+	}
+
+
+	@MessageMapping("/room/pause")
+	public void pause(RoomDto roomDto) {
+		this.simpMessagingTemplate.convertAndSend("/topic/room/all/pause", roomDto);
+		this.simpMessagingTemplate.convertAndSend("/topic/room/" + roomDto.getId() + "/pause", roomDto);
+	}
+
+	@MessageMapping("/room/pauseTimer")
+	public void pauseTimer(RoomDto roomDto) throws ProxiadControllerException {
+		final Room room = getRoom(roomDto);
+
+		final Timer timer = Optional.ofNullable(room.getTimer()).orElseThrow(() -> new ProxiadControllerException("No timer found for the room " + room.getName()));
+		final long remainingTime = timer.getStartTime().until(LocalDateTime.now(), ChronoUnit.SECONDS);
+
+		timer.setStartTime(LocalDateTime.now());
+		timer.setStatus(TimerStatusEnum.PAUSED);
+		timer.setRemainingTime(Math.toIntExact(remainingTime));
+
+		room.setTimer(timer);
+		roomRepository.save(room);
+
+		this.simpMessagingTemplate.convertAndSend("/topic/room/all/pauseTimer", room);
+	}
+
+	private Room getRoom(RoomDto roomDto) throws ProxiadControllerException {
+		return roomRepository.findById(roomDto.getId())
+				.orElseThrow(() -> new ProxiadControllerException("Room " + roomDto.getId() + " doesn't exists"));
 	}
 
 	@MessageMapping("/room/message")
