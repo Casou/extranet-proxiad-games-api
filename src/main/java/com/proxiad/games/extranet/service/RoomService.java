@@ -26,7 +26,7 @@ public class RoomService {
 					dto.setToken(room.getConnectedToken() != null ? room.getConnectedToken().getToken() : null);
 					Optional.ofNullable(room.getTimer()).ifPresent(timer -> {
 						dto.setStartTime(timer.getStartTime());
-						dto.setRemainingTime(timer.getRemainingTime());
+						dto.setRemainingTime(Math.max(0, timer.getRemainingTime()));
 						dto.setStatusTime(timer.getStatus());
 					});
 					return dto;

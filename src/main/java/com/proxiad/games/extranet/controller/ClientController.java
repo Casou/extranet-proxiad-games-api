@@ -1,4 +1,4 @@
-package com.proxiad.games.extranet.controller.websocket;
+package com.proxiad.games.extranet.controller;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -18,7 +18,7 @@ import com.proxiad.games.extranet.repository.RoomRepository;
 import com.proxiad.games.extranet.service.AuthService;
 
 @RestController
-public class WSClientController {
+public class ClientController {
 
 	@Autowired
 	private AuthService authService;
@@ -70,6 +70,7 @@ public class WSClientController {
 			UserSessionDto userSessionDto = CONNECTED_USERS_TOKEN.get(token);
 			userSessionDto.setSessionId(sessionId);
 			userSessionDto.setIsConnected(true);
+			this.simpMessagingTemplate.convertAndSend("/topic/user/connected", userSessionDto);
 			return;
 		}
 

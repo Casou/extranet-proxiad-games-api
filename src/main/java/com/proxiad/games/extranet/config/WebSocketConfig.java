@@ -16,7 +16,7 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 import org.springframework.web.socket.messaging.SessionConnectEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
-import com.proxiad.games.extranet.controller.websocket.WSClientController;
+import com.proxiad.games.extranet.controller.ClientController;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -29,7 +29,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 	private WebSocketHandshakeInterceptor webSocketHandshakeInterceptor;
 
 	@Autowired
-	private WSClientController wsUserController;
+	private ClientController wsUserController;
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {

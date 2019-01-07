@@ -5,7 +5,10 @@ import lombok.Data;
 @Data
 public class UnlockDto {
 
-	private String id;
+	private Integer id;
 	private String password;
+
+	private String riddleId;
+	private Integer roomId;
 
 }

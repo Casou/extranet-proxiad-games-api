@@ -27,10 +27,14 @@ public class Room {
 
 	@Column(name = "resolved_riddles")
 	@ElementCollection(fetch =  FetchType.EAGER)
-	private List<Integer> resolvedRiddleIds = new ArrayList<>();
+	private List<Riddle> resolvedRiddles = new ArrayList<>();
 
 	@OneToOne(fetch = FetchType.EAGER, cascade=CascadeType.ALL)
 	@JoinColumn(name = "timer_id")
 	private Timer timer;
+
+	public boolean containsRiddle(String riddleId) {
+		return resolvedRiddles.stream().anyMatch(r -> r.getRiddleId().equals(riddleId));
+	}
 
 }

@@ -8,6 +8,7 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.proxiad.games.extranet.controller.ClientController;
 import com.proxiad.games.extranet.dto.TerminalCommandDto;
 import com.proxiad.games.extranet.dto.TokenDto;
 import com.proxiad.games.extranet.model.Room;
@@ -21,7 +22,7 @@ public class TerminalWSController {
 	private AuthService authService;
 
 	@Autowired
-	private WSClientController wsUserController;
+	private ClientController wsUserController;
 
 	@Autowired
 	private RoomRepository roomRepository;

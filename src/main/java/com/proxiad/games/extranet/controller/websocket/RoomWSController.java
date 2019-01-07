@@ -31,7 +31,7 @@ public class RoomWSController {
 		final Room room = getRoom(roomDto);
 
 		final Timer timer = Optional.ofNullable(room.getTimer()).orElse(new Timer());
-		timer.setRemainingTime(roomDto.getRemainingTime());
+		timer.setRemainingTime(Math.max(0, roomDto.getRemainingTime()));
 		room.setTimer(timer);
 		roomRepository.save(room);
 
@@ -68,7 +68,7 @@ public class RoomWSController {
 
 		timer.setStartTime(LocalDateTime.now());
 		timer.setStatus(TimerStatusEnum.PAUSED);
-		timer.setRemainingTime(Math.toIntExact(remainingTime));
+		timer.setRemainingTime(Math.max(0, Math.toIntExact(remainingTime)));
 
 		room.setTimer(timer);
 		roomRepository.save(room);

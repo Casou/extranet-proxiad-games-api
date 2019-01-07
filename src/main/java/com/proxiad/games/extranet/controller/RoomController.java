@@ -1,5 +1,6 @@
 package com.proxiad.games.extranet.controller;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -35,7 +36,8 @@ public class RoomController {
 	public RoomStatusDto getRoomStatus(@RequestAttribute Optional<Room> room) {
 		List<RiddleDto> riddleDtos = riddleRepository.findAll().stream()
 				.map(RiddleDto::new)
-				.peek(riddleDto -> riddleDto.setIsResolved(room.orElse(new Room()).getResolvedRiddleIds().contains(riddleDto.getRiddleId())))
+				.peek(riddleDto -> riddleDto.setIsResolved(room.orElse(new Room()).containsRiddle(riddleDto.getRiddleId())))
+				.sorted(Comparator.comparing(RiddleDto::getRiddleId))
 				.collect(Collectors.toList());
 
 		return RoomStatusDto.builder()
