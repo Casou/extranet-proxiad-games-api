@@ -5,6 +5,7 @@ import lombok.Data;
 @Data
 public class TerminalCommandDto {
 
+	private Integer roomId;
 	private String token;
 	private String command;
 	private String text;

@@ -11,6 +11,7 @@ import lombok.Data;
 public class UserSessionDto {
 
 	private String token;
+	private Integer roomId;
 	private String sessionId;
 	private Boolean isConnected;
 	@Builder.Default

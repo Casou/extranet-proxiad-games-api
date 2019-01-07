@@ -7,16 +7,14 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestAttribute;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.proxiad.games.extranet.dto.UnlockDto;
 import com.proxiad.games.extranet.model.UnlockedRiddle;
 import com.proxiad.games.extranet.repository.UnlockedRiddleRepository;
 
 @RestController
+@CrossOrigin
 public class UnlockController {
 
 	@Autowired

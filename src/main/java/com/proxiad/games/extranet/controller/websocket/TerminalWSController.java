@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.proxiad.games.extranet.dto.TerminalCommandDto;
 import com.proxiad.games.extranet.dto.TokenDto;
+import com.proxiad.games.extranet.model.Room;
+import com.proxiad.games.extranet.repository.RoomRepository;
 import com.proxiad.games.extranet.service.AuthService;
 
 @RestController
@@ -21,8 +23,11 @@ public class TerminalWSController {
 	@Autowired
 	private WSClientController wsUserController;
 
+	@Autowired
+	private RoomRepository roomRepository;
+
 	@MessageMapping("/terminalCommand")
-	@SendTo("/topic/terminalCommand")
+	@SendTo("/topic/riddle/terminalCommand")
 	public TerminalCommandDto newTerminalCommand(@Header(value = "authorization") String authorizationToken, TerminalCommandDto terminalCommandDto) {
 		Optional<TokenDto> validToken = authService.validateToken(authorizationToken);
 		if (!validToken.isPresent()) {
@@ -30,6 +35,9 @@ public class TerminalWSController {
 		}
 
 		wsUserController.addCommandToUser(authorizationToken, terminalCommandDto);
+
+		Optional<Room> optRoom = roomRepository.findByToken(authorizationToken);
+		terminalCommandDto.setRoomId(optRoom.orElse(new Room()).getId());
 
 		terminalCommandDto.setToken(authorizationToken);
 		return terminalCommandDto;
