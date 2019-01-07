@@ -64,7 +64,7 @@ public class RoomWSController {
 		final Room room = getRoom(roomDto);
 
 		final Timer timer = Optional.ofNullable(room.getTimer()).orElseThrow(() -> new ProxiadControllerException("No timer found for the room " + room.getName()));
-		final long remainingTime = timer.getStartTime().until(LocalDateTime.now(), ChronoUnit.SECONDS);
+		final long remainingTime = timer.getRemainingTime() - timer.getStartTime().until(LocalDateTime.now(), ChronoUnit.SECONDS);
 
 		timer.setStartTime(LocalDateTime.now());
 		timer.setStatus(TimerStatusEnum.PAUSED);
