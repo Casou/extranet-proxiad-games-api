@@ -66,8 +66,15 @@ public class WSClientController {
 	}
 
 	public void userConnected(String token, String sessionId) {
-		Optional<TokenDto> optToken = authService.validateToken(token);
+		if (CONNECTED_USERS_TOKEN.containsKey(token)) {
+			UserSessionDto userSessionDto = CONNECTED_USERS_TOKEN.get(token);
+			userSessionDto.setSessionId(sessionId);
+			userSessionDto.setIsConnected(true);
+			return;
+		}
+
 		Optional<Room> optRoom = roomRepository.findByToken(token);
+		Optional<TokenDto> optToken = authService.validateToken(token);
 
 		optToken.ifPresent(tokenDto -> {
 			UserSessionDto userSessionDto = UserSessionDto.builder()
