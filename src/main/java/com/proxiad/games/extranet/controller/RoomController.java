@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import com.proxiad.games.extranet.annotation.AdminTokenSecurity;
@@ -36,6 +37,9 @@ public class RoomController {
 
 	@Autowired
 	private RoomMapper roomMapper;
+
+	@Autowired
+	private SimpMessagingTemplate simpMessagingTemplate;
 
 	@GetMapping("/unlock/status")
 	public RoomStatusDto getRoomStatus(@RequestAttribute Optional<Room> room) {
@@ -108,6 +112,8 @@ public class RoomController {
 		room.setResolvedRiddles(new ArrayList<>());
 		room.setTimer(null);
 		roomRepository.save(room);
+
+		this.simpMessagingTemplate.convertAndSend("/topic/room/" + room.getId() + "/reinit", new RoomDto());
 
 		return new ResponseEntity<>(roomMapper.toDto(room), HttpStatus.OK);
 	}
