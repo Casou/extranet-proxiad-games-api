@@ -1,5 +1,6 @@
 package com.proxiad.games.extranet.controller;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -14,6 +15,7 @@ import com.proxiad.games.extranet.annotation.AdminTokenSecurity;
 import com.proxiad.games.extranet.dto.RiddleDto;
 import com.proxiad.games.extranet.dto.RoomDto;
 import com.proxiad.games.extranet.dto.RoomStatusDto;
+import com.proxiad.games.extranet.mapper.RoomMapper;
 import com.proxiad.games.extranet.model.Room;
 import com.proxiad.games.extranet.repository.RiddleRepository;
 import com.proxiad.games.extranet.repository.RoomRepository;
@@ -31,6 +33,9 @@ public class RoomController {
 
 	@Autowired
 	private RoomRepository roomRepository;
+
+	@Autowired
+	private RoomMapper roomMapper;
 
 	@GetMapping("/unlock/status")
 	public RoomStatusDto getRoomStatus(@RequestAttribute Optional<Room> room) {
@@ -89,6 +94,22 @@ public class RoomController {
 		roomRepository.delete(optRoom.get());
 
 		return new ResponseEntity<>("deleted", HttpStatus.OK);
+	}
+
+	@PatchMapping(value = "/room/{id}")
+	@AdminTokenSecurity
+	public ResponseEntity<?> reinitRoom(@PathVariable("id") Integer id) {
+		Optional<Room> optRoom = roomRepository.findById(id);
+		if (!optRoom.isPresent()) {
+			return new ResponseEntity<>("No room with id " + id, HttpStatus.BAD_REQUEST);
+		}
+
+		Room room = optRoom.get();
+		room.setResolvedRiddles(new ArrayList<>());
+		room.setTimer(null);
+		roomRepository.save(room);
+
+		return new ResponseEntity<>(roomMapper.toDto(room), HttpStatus.OK);
 	}
 
 }

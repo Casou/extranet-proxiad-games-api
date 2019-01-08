@@ -13,6 +13,7 @@ import com.proxiad.games.extranet.dto.RoomDto;
 import com.proxiad.games.extranet.dto.RoomMessageDto;
 import com.proxiad.games.extranet.enums.TimerStatusEnum;
 import com.proxiad.games.extranet.exception.ProxiadControllerException;
+import com.proxiad.games.extranet.mapper.RoomMapper;
 import com.proxiad.games.extranet.model.Room;
 import com.proxiad.games.extranet.model.Timer;
 import com.proxiad.games.extranet.repository.RoomRepository;
@@ -25,6 +26,10 @@ public class RoomWSController {
 
 	@Autowired
 	private RoomRepository roomRepository;
+
+	@Autowired
+	private RoomMapper roomMapper;
+
 
 	@MessageMapping("/room/start")
 	public void start(RoomDto roomDto) throws ProxiadControllerException {
@@ -49,18 +54,12 @@ public class RoomWSController {
 		room.setTimer(timer);
 		roomRepository.save(room);
 
-		this.simpMessagingTemplate.convertAndSend("/topic/room/all/startTimer", room);
+		this.simpMessagingTemplate.convertAndSend("/topic/room/all/startTimer", roomMapper.toDto(room));
 	}
 
 
 	@MessageMapping("/room/pause")
-	public void pause(RoomDto roomDto) {
-		this.simpMessagingTemplate.convertAndSend("/topic/room/all/pause", roomDto);
-		this.simpMessagingTemplate.convertAndSend("/topic/room/" + roomDto.getId() + "/pause", roomDto);
-	}
-
-	@MessageMapping("/room/pauseTimer")
-	public void pauseTimer(RoomDto roomDto) throws ProxiadControllerException {
+	public void pause(RoomDto roomDto) throws ProxiadControllerException {
 		final Room room = getRoom(roomDto);
 
 		final Timer timer = Optional.ofNullable(room.getTimer()).orElseThrow(() -> new ProxiadControllerException("No timer found for the room " + room.getName()));
@@ -73,7 +72,9 @@ public class RoomWSController {
 		room.setTimer(timer);
 		roomRepository.save(room);
 
-		this.simpMessagingTemplate.convertAndSend("/topic/room/all/pauseTimer", room);
+		RoomDto payload = roomMapper.toDto(room);
+		this.simpMessagingTemplate.convertAndSend("/topic/room/all/pause", payload);
+		this.simpMessagingTemplate.convertAndSend("/topic/room/" + roomDto.getId() + "/pause", payload);
 	}
 
 	private Room getRoom(RoomDto roomDto) throws ProxiadControllerException {
