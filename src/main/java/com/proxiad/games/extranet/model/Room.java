@@ -33,6 +33,8 @@ public class Room {
 	@JoinColumn(name = "timer_id")
 	private Timer timer;
 
+	private Boolean isTerminated = false;
+
 	public boolean containsRiddle(String riddleId) {
 		return resolvedRiddles.stream().anyMatch(r -> r.getRiddleId().equals(riddleId));
 	}

@@ -1,7 +1,6 @@
 package com.proxiad.games.extranet.controller.websocket;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,11 +62,10 @@ public class RoomWSController {
 		final Room room = getRoom(roomDto);
 
 		final Timer timer = Optional.ofNullable(room.getTimer()).orElseThrow(() -> new ProxiadControllerException("No timer found for the room " + room.getName()));
-		final long remainingTime = timer.getRemainingTime() - timer.getStartTime().until(LocalDateTime.now(), ChronoUnit.SECONDS);
 
 		timer.setStartTime(LocalDateTime.now());
 		timer.setStatus(TimerStatusEnum.PAUSED);
-		timer.setRemainingTime(Math.max(0, Math.toIntExact(remainingTime)));
+		timer.setRemainingTime(timer.calculatedRemainingTime());
 
 		room.setTimer(timer);
 		roomRepository.save(room);

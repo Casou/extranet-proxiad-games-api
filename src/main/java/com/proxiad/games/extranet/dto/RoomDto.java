@@ -19,6 +19,7 @@ public class RoomDto {
 	private String name;
 	private String token;
 	private List<RiddleDto> resolvedRiddles = new ArrayList<>();
+	private Boolean isTerminated;
 
 	private TimerStatusEnum statusTime;
 	private LocalDateTime startTime;
