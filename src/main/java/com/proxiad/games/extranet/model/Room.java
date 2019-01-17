@@ -34,6 +34,7 @@ public class Room {
 	private Timer timer;
 
 	private Boolean isTerminated = false;
+	private String terminateStatus;
 
 	public boolean containsRiddle(String riddleId) {
 		return resolvedRiddles.stream().anyMatch(r -> r.getRiddleId().equals(riddleId));

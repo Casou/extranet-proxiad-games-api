@@ -60,10 +60,11 @@ public class RedPillController {
 		room.setTimer(timer);
 
 		room.setIsTerminated(true);
+		room.setTerminateStatus("success");
 		roomRepository.save(room);
 
 		this.simpMessagingTemplate.convertAndSend("/topic/room/" + room.getId() + "/terminate", new RoomDto());
-		this.simpMessagingTemplate.convertAndSend("/topic/room/all/terminate", roomMapper.toDto(room));
+		this.simpMessagingTemplate.convertAndSend("/topic/room/all/success", roomMapper.toDto(room));
 
 		return new ResponseEntity<>("Access granted", HttpStatus.OK);
 	}

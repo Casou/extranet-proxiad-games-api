@@ -112,6 +112,7 @@ public class RoomController {
 		room.setResolvedRiddles(new ArrayList<>());
 		room.setTimer(null);
 		room.setIsTerminated(false);
+		room.setTerminateStatus(null);
 		roomRepository.save(room);
 
 		this.simpMessagingTemplate.convertAndSend("/topic/room/" + room.getId() + "/reinit", new RoomDto());

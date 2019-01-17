@@ -20,6 +20,7 @@ public class RoomDto {
 	private String token;
 	private List<RiddleDto> resolvedRiddles = new ArrayList<>();
 	private Boolean isTerminated;
+	private String terminateStatus;
 
 	private TimerStatusEnum statusTime;
 	private LocalDateTime startTime;
