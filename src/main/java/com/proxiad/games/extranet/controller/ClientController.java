@@ -71,6 +71,7 @@ public class ClientController {
 			userSessionDto.setSessionId(sessionId);
 			userSessionDto.setIsConnected(true);
 			this.simpMessagingTemplate.convertAndSend("/topic/user/connected", userSessionDto);
+			this.simpMessagingTemplate.convertAndSend("/topic/user/" + userSessionDto.getRoomId() + "/connected", userSessionDto);
 			return;
 		}
 
@@ -87,6 +88,7 @@ public class ClientController {
 
 			CONNECTED_USERS_TOKEN.put(token, userSessionDto);
 			this.simpMessagingTemplate.convertAndSend("/topic/user/connected", userSessionDto);
+			this.simpMessagingTemplate.convertAndSend("/topic/user/" + userSessionDto.getRoomId() + "/connected", userSessionDto);
 		});
 	}
 

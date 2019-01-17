@@ -56,6 +56,7 @@ public class UnlockController {
 		unlockDto.setId(riddle.getId());
 		unlockDto.setRoomId(room.getId());
 		this.simpMessagingTemplate.convertAndSend("/topic/riddle/unlock", unlockDto);
+		this.simpMessagingTemplate.convertAndSend("/topic/room/" + room.getId() + "/unlockRiddle", unlockDto);
 
 		return new ResponseEntity<>("unlocked", HttpStatus.OK);
 	}
