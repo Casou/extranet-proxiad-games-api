@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -55,6 +56,11 @@ public class TimerWSController {
 		this.simpMessagingTemplate.convertAndSend("/topic/room/all/startTimer", roomMapper.toDto(room));
 	}
 
+	@MessageMapping("/room/refreshTimer")
+	@SendTo("/topic/room/all/refreshTimer")
+	public RoomDto refreshTimer(RoomDto roomDto) {
+		return roomDto;
+	}
 
 	@MessageMapping("/room/pause")
 	public void pause(RoomDto roomDto) throws ProxiadControllerException {

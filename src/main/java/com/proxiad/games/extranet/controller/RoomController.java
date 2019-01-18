@@ -17,9 +17,11 @@ import com.proxiad.games.extranet.annotation.BypassSecurity;
 import com.proxiad.games.extranet.dto.RiddleDto;
 import com.proxiad.games.extranet.dto.RoomDto;
 import com.proxiad.games.extranet.dto.RoomStatusDto;
+import com.proxiad.games.extranet.dto.RoomTrollDto;
 import com.proxiad.games.extranet.exception.ProxiadControllerException;
 import com.proxiad.games.extranet.mapper.RoomMapper;
 import com.proxiad.games.extranet.model.Room;
+import com.proxiad.games.extranet.model.Timer;
 import com.proxiad.games.extranet.repository.RiddleRepository;
 import com.proxiad.games.extranet.repository.RoomRepository;
 import com.proxiad.games.extranet.service.RoomService;
@@ -130,7 +132,21 @@ public class RoomController {
 			throw new ProxiadControllerException("Your room is unknown. Please contact the administrator.");
 		}
 
-		this.simpMessagingTemplate.convertAndSend("/topic/room/" + optRoom.get().getId() + "/troll", roomDto);
+		Room room = optRoom.get();
+
+		final Timer timer = Optional.ofNullable(room.getTimer()).orElseThrow(() -> new ProxiadControllerException("No timer found for the room " + room.getName()));
+		timer.setRemainingTime(Math.max(0, timer.getRemainingTime() - 120));
+		room.setTimer(timer);
+		roomRepository.save(room);
+
+		RoomTrollDto roomTrollDto = RoomTrollDto.builder()
+				.id(room.getId())
+				.name(room.getName())
+				.reduceTime(120)
+				.build();
+
+		this.simpMessagingTemplate.convertAndSend("/topic/room/all/troll", roomTrollDto);
+		this.simpMessagingTemplate.convertAndSend("/topic/room/" + room.getId() + "/troll", roomTrollDto);
 	}
 
 }
