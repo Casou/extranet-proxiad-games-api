@@ -13,9 +13,11 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import com.proxiad.games.extranet.annotation.AdminTokenSecurity;
+import com.proxiad.games.extranet.annotation.BypassSecurity;
 import com.proxiad.games.extranet.dto.RiddleDto;
 import com.proxiad.games.extranet.dto.RoomDto;
 import com.proxiad.games.extranet.dto.RoomStatusDto;
+import com.proxiad.games.extranet.exception.ProxiadControllerException;
 import com.proxiad.games.extranet.mapper.RoomMapper;
 import com.proxiad.games.extranet.model.Room;
 import com.proxiad.games.extranet.repository.RiddleRepository;
@@ -118,6 +120,17 @@ public class RoomController {
 		this.simpMessagingTemplate.convertAndSend("/topic/room/" + room.getId() + "/reinit", new RoomDto());
 
 		return new ResponseEntity<>(roomMapper.toDto(room), HttpStatus.OK);
+	}
+
+	@PostMapping("/user/troll")
+	@BypassSecurity
+	public void troll(@RequestBody RoomDto roomDto) throws ProxiadControllerException {
+		Optional<Room> optRoom = roomRepository.findByNameIgnoreCase(roomDto.getName());
+		if (!optRoom.isPresent()) {
+			throw new ProxiadControllerException("Your room is unknown. Please contact the administrator.");
+		}
+
+		this.simpMessagingTemplate.convertAndSend("/topic/room/" + optRoom.get().getId() + "/troll", roomDto);
 	}
 
 }
