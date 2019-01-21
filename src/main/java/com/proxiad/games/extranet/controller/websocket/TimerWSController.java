@@ -10,6 +10,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.proxiad.games.extranet.dto.RoomDto;
+import com.proxiad.games.extranet.dto.RoomTrollDto;
 import com.proxiad.games.extranet.enums.TimerStatusEnum;
 import com.proxiad.games.extranet.exception.ProxiadControllerException;
 import com.proxiad.games.extranet.mapper.RoomMapper;
@@ -56,10 +57,19 @@ public class TimerWSController {
 		this.simpMessagingTemplate.convertAndSend("/topic/room/all/startTimer", roomMapper.toDto(room));
 	}
 
-	@MessageMapping("/room/refreshTimer")
-	@SendTo("/topic/room/all/refreshTimer")
-	public RoomDto refreshTimer(RoomDto roomDto) {
-		return roomDto;
+	@MessageMapping("/room/reduceTime")
+	@SendTo("/topic/room/all/reduceTime")
+	public RoomTrollDto reduceTimerByTroll(RoomTrollDto roomTrollDto) throws ProxiadControllerException {
+		Optional<Room> optRoom = roomRepository.findById(roomTrollDto.getId());
+		if (!optRoom.isPresent()) {
+			throw new ProxiadControllerException("Room with id " + roomTrollDto.getId() + " not found");
+		}
+
+		Timer timer = optRoom.get().getTimer();
+		roomTrollDto.setStartTime(timer.getStartTime());
+		roomTrollDto.setRemainingTime(timer.getRemainingTime());
+
+		return roomTrollDto;
 	}
 
 	@MessageMapping("/room/pause")
