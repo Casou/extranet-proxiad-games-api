@@ -5,10 +5,12 @@ import javax.persistence.*;
 import org.springframework.lang.NonNull;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Entity
-@Table(name="people")
+@Table(name="parameter")
+@NoArgsConstructor
 public class Parameter {
 
 	@Id
@@ -17,6 +19,8 @@ public class Parameter {
 
 	@NonNull
 	private String key;
+
+	private String description;
 
 	@NonNull
 	private String value;
