@@ -26,7 +26,7 @@ public class RoomWSController {
 	private RoomRepository roomRepository;
 
 	@MessageMapping("/room/message")
-	public void sendMessage(RoomMessageDto messageDto) throws ProxiadControllerException {
+	public void sendMessage(RoomMessageDto messageDto) {
 		this.simpMessagingTemplate.convertAndSend("/topic/room/" + messageDto.getRoom().getId() + "/message", messageDto);
 	}
 
@@ -53,6 +53,11 @@ public class RoomWSController {
 		roomRepository.save(room);
 
 		return roomDto;
+	}
+
+	@MessageMapping("/room/refresh")
+	public void refreshFront(RoomDto roomDto) {
+		this.simpMessagingTemplate.convertAndSend("/topic/refresh/" + roomDto.getId(), roomDto);
 	}
 
 }
