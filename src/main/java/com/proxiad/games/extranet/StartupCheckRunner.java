@@ -28,7 +28,7 @@ public class StartupCheckRunner implements CommandLineRunner {
 				.collect(Collectors.toList());
 
 		if (!unexistingParameters.isEmpty()) {
-			log.error("There are unexisting parameters in database : " + String.join(", ", unexistingParameters));
+			log.error("There are missing parameters in database : " + String.join(", ", unexistingParameters));
 		}
 
 	}
