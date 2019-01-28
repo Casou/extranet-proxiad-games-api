@@ -10,6 +10,6 @@ import com.proxiad.games.extranet.model.IntroSentence;
 @Repository
 public interface IntroSentenceRepository extends CrudRepository<IntroSentence, Integer> {
 
-	List<IntroSentence> findAll();
+	List<IntroSentence> findAllByOrderByIdAsc();
 
 }

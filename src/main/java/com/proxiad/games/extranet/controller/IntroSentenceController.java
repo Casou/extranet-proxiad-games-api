@@ -25,7 +25,7 @@ public class IntroSentenceController {
 	@GetMapping("/intro_sentences")
 	@AdminTokenSecurity
 	public List<IntroSentence> findAll() {
-		return introSentenceRepository.findAll();
+		return introSentenceRepository.findAllByOrderByIdAsc();
 	}
 
 	@PostMapping("/intro_sentence")
