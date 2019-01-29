@@ -1,0 +1,14 @@
+package com.proxiad.games.extranet.enums;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import lombok.Getter;
+
+@Getter
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
+public enum TextEnum {
+
+	INTRO,
+	PROGRESS_BAR
+
+}
