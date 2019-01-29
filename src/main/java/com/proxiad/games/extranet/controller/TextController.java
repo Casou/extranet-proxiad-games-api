@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import com.proxiad.games.extranet.annotation.AdminTokenSecurity;
+import com.proxiad.games.extranet.annotation.BypassSecurity;
 import com.proxiad.games.extranet.dto.TextDto;
 import com.proxiad.games.extranet.enums.TextEnum;
 import com.proxiad.games.extranet.exception.ProxiadControllerException;
@@ -25,25 +26,31 @@ public class TextController {
 	@Autowired
 	private TextService textService;
 
-	@GetMapping("/intro")
-	@AdminTokenSecurity
+	@GetMapping
+	@BypassSecurity
 	public List<Text> findAll() {
-		return textRepository.findAllByDiscriminantOrderByIdAsc(TextEnum.INTRO);
+		return textRepository.findAllByOrderByIdAsc();
 	}
 
 	@PostMapping("/intro")
 	@AdminTokenSecurity
-	public Text createSentence() {
+	public Text createIntroSentence() {
 		return textRepository.save(new Text(TextEnum.INTRO));
 	}
 
-	@PatchMapping("/intro")
+	@PostMapping("/progress")
+	@AdminTokenSecurity
+	public Text createProgress() {
+		return textRepository.save(new Text(TextEnum.PROGRESS_BAR));
+	}
+
+	@PatchMapping
 	@AdminTokenSecurity
 	public void updateSentence(@RequestBody TextDto introSentence) throws ProxiadControllerException {
 		textService.updateSentence(introSentence);
 	}
 
-	@DeleteMapping("/intro")
+	@DeleteMapping
 	@AdminTokenSecurity
 	public void deleteSentence(@RequestBody Text introSentence) throws ProxiadControllerException {
 		Optional<Text> optIntro = textRepository.findById(introSentence.getId());
