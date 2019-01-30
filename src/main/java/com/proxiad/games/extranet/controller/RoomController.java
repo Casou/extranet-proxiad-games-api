@@ -124,10 +124,10 @@ public class RoomController {
 		return new ResponseEntity<>(roomMapper.toDto(room), HttpStatus.OK);
 	}
 
-	@PostMapping("/user/troll")
+	@GetMapping("/user/troll")
 	@BypassSecurity
-	public void troll(@RequestBody RoomDto roomDto) throws ProxiadControllerException {
-		Optional<Room> optRoom = roomRepository.findByNameIgnoreCase(roomDto.getName());
+	public void troll(@RequestParam("salle") String roomName) throws ProxiadControllerException {
+		Optional<Room> optRoom = roomRepository.findByNameIgnoreCase(roomName);
 		if (!optRoom.isPresent()) {
 			throw new ProxiadControllerException("Your room is unknown. Please contact the administrator.");
 		}
