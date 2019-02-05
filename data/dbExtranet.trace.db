@@ -52,3 +52,256 @@ where city = "Lille" [42122-197]
 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
 	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)
 	at java.lang.Thread.run(Thread.java:748)
+2019-02-05 15:33:35 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLException: Erreur de syntaxe dans linstruction SQL {0}
+Syntax error in SQL statement {0}; SQL statement:
+select id, TO_CHAR(birth_date, 'DD/MM/YYYY') as birthday, CONCAT(surname, name), TO_CHAR(arrival_date, 'DD/MM/YYYY'), as arrival * FROM PEOPLE 
+where city = 'Lille' [42000-197]
+2019-02-05 15:33:44 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLException: Erreur de syntaxe dans linstruction SQL {0}
+Syntax error in SQL statement {0}; SQL statement:
+select id, TO_CHAR(birth_date, 'DD/MM/YYYY') as birthday, TO_CHAR(arrival_date, 'DD/MM/YYYY'), as arrival * FROM PEOPLE 
+where city = 'Lille' [42000-197]
+2019-02-05 15:34:15 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLException: Colonne " " non trouvée
+Column " " not found; SQL statement:
+select id, TO_CHAR(birth_date, 'DD/MM/YYYY') as birthday, surname || " " || name as name, TO_CHAR(arrival_date, 'DD/MM/YYYY') as arrival,  * FROM PEOPLE 
+where city = 'Lille' [42122-197]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:357)
+	at org.h2.message.DbException.get(DbException.java:179)
+	at org.h2.message.DbException.get(DbException.java:155)
+	at org.h2.expression.ExpressionColumn.optimize(ExpressionColumn.java:150)
+	at org.h2.expression.Operation.optimize(Operation.java:192)
+	at org.h2.expression.Operation.optimize(Operation.java:183)
+	at org.h2.expression.Alias.optimize(Alias.java:51)
+	at org.h2.command.dml.Select.prepare(Select.java:858)
+	at org.h2.command.Parser.prepareCommand(Parser.java:283)
+	at org.h2.engine.Session.prepareLocal(Session.java:611)
+	at org.h2.engine.Session.prepareCommand(Session.java:549)
+	at org.h2.jdbc.JdbcConnection.prepareCommand(JdbcConnection.java:1247)
+	at org.h2.jdbc.JdbcStatement.executeInternal(JdbcStatement.java:217)
+	at org.h2.jdbc.JdbcStatement.execute(JdbcStatement.java:1077)
+	at org.h2.server.web.WebApp.getResult(WebApp.java:1386)
+	at org.h2.server.web.WebApp.query(WebApp.java:1060)
+	at org.h2.server.web.WebApp.query(WebApp.java:1036)
+	at org.h2.server.web.WebApp.process(WebApp.java:223)
+	at org.h2.server.web.WebApp.processRequest(WebApp.java:170)
+	at org.h2.server.web.WebServlet.doGet(WebServlet.java:124)
+	at org.h2.server.web.WebServlet.doPost(WebServlet.java:161)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:660)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:741)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:231)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:53)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at com.proxiad.games.extranet.config.JWTFilter.doFilter(JWTFilter.java:68)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:200)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:199)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:96)
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:490)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:139)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:92)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:343)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:408)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:66)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:791)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1417)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:49)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)
+	at java.lang.Thread.run(Thread.java:748)
+2019-02-05 15:35:47 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLException: Erreur de syntaxe dans linstruction SQL {0}
+Syntax error in SQL statement {0}; SQL statement:
+select id, 
+CASE (SEX) WHEN 1 THEN 'M' ELSE 'F4 as sex,
+TO_CHAR(birth_date, 'DD/MM/YYYY') as birthday, 
+surname || ' ' || name as name, 
+TO_CHAR(arrival_date, 'DD/MM/YYYY') as arrival, 
+* FROM PEOPLE 
+where city = 'Lille'; [42000-197]
+2019-02-05 15:36:07 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLException: Erreur de syntaxe dans linstruction SQL {0}
+Syntax error in SQL statement {0}; SQL statement:
+select id, 
+CASE sex WHEN 1 THEN 'M' ELSE 'F4 as sex,
+TO_CHAR(birth_date, 'DD/MM/YYYY') as birthday, 
+surname || ' ' || name as name, 
+TO_CHAR(arrival_date, 'DD/MM/YYYY') as arrival, 
+* FROM PEOPLE 
+where city = 'Lille'; [42000-197]
+2019-02-05 15:37:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLException: Erreur de syntaxe dans linstruction SQL {0}
+Syntax error in SQL statement {0}; SQL statement:
+select id, 
+CASEWHEN(sex == 1, 'M', 'F') as sex,
+TO_CHAR(birth_date, 'DD/MM/YYYY') as birthday, 
+surname || ' ' || name as name, 
+TO_CHAR(arrival_date, 'DD/MM/YYYY') as arrival, 
+* FROM PEOPLE 
+where city = 'Lille' [42000-197]
+2019-02-05 15:37:57 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLException: Erreur de syntaxe dans linstruction SQL {0}
+Syntax error in SQL statement {0}; SQL statement:
+select id, 
+CASE WHEN sex == 1 THEN 'M' ELSE 'F' END as sex,
+TO_CHAR(birth_date, 'DD/MM/YYYY') as birthday, 
+surname || ' ' || name as name, 
+TO_CHAR(arrival_date, 'DD/MM/YYYY') as arrival, 
+* FROM PEOPLE 
+where city = 'Lille' [42000-197]
+2019-02-05 15:38:01 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLException: Erreur de syntaxe dans linstruction SQL {0}
+Syntax error in SQL statement {0}; SQL statement:
+select id, 
+CASE WHEN sex == 1 THEN 'M' ELSE 'F' END,
+TO_CHAR(birth_date, 'DD/MM/YYYY') as birthday, 
+surname || ' ' || name as name, 
+TO_CHAR(arrival_date, 'DD/MM/YYYY') as arrival, 
+* FROM PEOPLE 
+where city = 'Lille' [42000-197]
+2019-02-05 15:39:07 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLException: Erreur de syntaxe dans linstruction SQL {0}
+Syntax error in SQL statement {0}; SQL statement:
+select 
+case when sex > 1 then 'yes' else 'No' end as canBuyBeer 
+* FROM PEOPLE 
+where city = 'Lille' [42000-197]
+2019-02-05 15:39:59 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLException: Erreur de syntaxe dans linstruction SQL {0}
+Syntax error in SQL statement {0}; SQL statement:
+select 
+case when 1 > 1 then 'yes' else 'No' end as canBuyBeer 
+* FROM PEOPLE 
+where city = 'Lille' [42000-197]
+2019-02-05 15:40:22 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLException: Erreur de syntaxe dans linstruction SQL {0}
+Syntax error in SQL statement {0}; SQL statement:
+select 
+case when sex == 1 then 'M' else 'F' end as sex,
+* FROM PEOPLE 
+where city = 'Lille' [42000-197]
+2019-02-05 15:40:29 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLException: Erreur de syntaxe dans linstruction SQL {0}
+Syntax error in SQL statement {0}; SQL statement:
+select 
+case when sex == 1 then 'M' else 'F' end,
+* FROM PEOPLE 
+where city = 'Lille' [42000-197]
+2019-02-05 15:41:34 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLException: Colonne "MAIL" non trouvée
+Column "MAIL" not found; SQL statement:
+select id, 
+CASE WHEN sex = 1 THEN 'M' ELSE 'F' END as sex,
+TO_CHAR(birth_date, 'DD/MM/YYYY') as birthday, 
+surname || ' ' || name as name, 
+'' as address,
+phone as tel,
+mail,
+TO_CHAR(arrival_date, 'DD/MM/YYYY') as arrival, 
+* FROM PEOPLE 
+where city = 'Lille' [42122-197]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:357)
+	at org.h2.message.DbException.get(DbException.java:179)
+	at org.h2.message.DbException.get(DbException.java:155)
+	at org.h2.expression.ExpressionColumn.optimize(ExpressionColumn.java:150)
+	at org.h2.command.dml.Select.prepare(Select.java:858)
+	at org.h2.command.Parser.prepareCommand(Parser.java:283)
+	at org.h2.engine.Session.prepareLocal(Session.java:611)
+	at org.h2.engine.Session.prepareCommand(Session.java:549)
+	at org.h2.jdbc.JdbcConnection.prepareCommand(JdbcConnection.java:1247)
+	at org.h2.jdbc.JdbcStatement.executeInternal(JdbcStatement.java:217)
+	at org.h2.jdbc.JdbcStatement.execute(JdbcStatement.java:1077)
+	at org.h2.server.web.WebApp.getResult(WebApp.java:1386)
+	at org.h2.server.web.WebApp.query(WebApp.java:1060)
+	at org.h2.server.web.WebApp.query(WebApp.java:1036)
+	at org.h2.server.web.WebApp.process(WebApp.java:223)
+	at org.h2.server.web.WebApp.processRequest(WebApp.java:170)
+	at org.h2.server.web.WebServlet.doGet(WebServlet.java:124)
+	at org.h2.server.web.WebServlet.doPost(WebServlet.java:161)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:660)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:741)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:231)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:53)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at com.proxiad.games.extranet.config.JWTFilter.doFilter(JWTFilter.java:68)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:200)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:199)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:96)
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:490)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:139)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:92)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:343)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:408)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:66)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:791)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1417)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:49)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)
+	at java.lang.Thread.run(Thread.java:748)
+2019-02-05 15:42:52 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLException: Erreur de syntaxe dans linstruction SQL {0}
+Syntax error in SQL statement {0}; SQL statement:
+select id, 
+CASE WHEN sex = 1 THEN 'M' ELSE 'F' END as sex,
+TO_CHAR(birth_date, 'DD/MM/YYYY') as birthday, 
+surname || ' ' || name as name, 
+'' as address,
+phone as tel,
+email as email_pro, 
+'' as email_perso,
+job
+TO_CHAR(arrival_date, 'DD/MM/YYYY') as arrival, 
+city 
+FROM PEOPLE 
+where city = 'Lille' [42000-197]
+2019-02-05 15:43:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLException: Erreur de syntaxe dans linstruction SQL {0}
+Syntax error in SQL statement {0}; SQL statement:
+select id, 
+CASE WHEN sex = 1 THEN 'M' ELSE 'F' END as sex,
+TO_CHAR(birth_date, 'DD/MM/YYYY') as birthday, 
+surname || ' ' || name as name, 
+'' as address,
+phone as tel,
+email as email_pro, 
+'' as email_perso,
+job
+TO_CHAR(arrival_date, 'DD/MM/YYYY') as arrival, 
+*
+FROM PEOPLE 
+where city = 'Lille' [42000-197]
+2019-02-05 15:43:01 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLException: Erreur de syntaxe dans linstruction SQL {0}
+Syntax error in SQL statement {0}; SQL statement:
+select id, 
+CASE WHEN sex = 1 THEN 'M' ELSE 'F' END as sex,
+TO_CHAR(birth_date, 'DD/MM/YYYY') as birthday, 
+surname || ' ' || name as name, 
+'' as address,
+phone as tel,
+email as email_pro, 
+'' as email_perso,
+job
+TO_CHAR(arrival_date, 'DD/MM/YYYY') as arrival, 
+*
+FROM PEOPLE 
+where city = 'Lille' [42000-197]

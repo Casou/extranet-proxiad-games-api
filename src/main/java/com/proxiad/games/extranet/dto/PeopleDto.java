@@ -26,6 +26,7 @@ public class PeopleDto {
 	private LocalDateTime arrivalDate;
 	private String email;
 	private String phone;
+	private String job;
 	private String city;
 	private Integer pictureIndex;
 	private Set<LanguageEnum> languages;
