@@ -9,6 +9,8 @@ import lombok.Getter;
 public enum TextEnum {
 
 	INTRO,
-	PROGRESS_BAR
+	PROGRESS_BAR,
+	TROLL,
+	TROLL_END,
 
 }

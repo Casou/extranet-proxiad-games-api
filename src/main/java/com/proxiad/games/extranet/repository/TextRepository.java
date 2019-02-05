@@ -10,6 +10,8 @@ import com.proxiad.games.extranet.model.Text;
 @Repository
 public interface TextRepository extends CrudRepository<Text, Integer> {
 
+	List<Text> findAll();
+
 	List<Text> findAllByOrderByIdAsc();
 
 }
