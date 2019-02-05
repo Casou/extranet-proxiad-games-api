@@ -10,6 +10,7 @@ import java.util.stream.IntStream;
 import org.springframework.stereotype.Component;
 
 import com.proxiad.games.extranet.enums.LanguageEnum;
+import com.proxiad.games.extranet.enums.SexeEnum;
 import com.proxiad.games.extranet.model.People;
 
 import lombok.Getter;
@@ -18,9 +19,14 @@ import lombok.Getter;
 public class PeopleGenerator {
 
 	private static final Map<Integer, Integer> MAP_MAX_PICTURE_INDEX_BY_SEX = new HashMap<Integer, Integer>() {{
-		put(1, 26);
-		put(2, 26);
+		put(SexeEnum.MALE.getCode(), 125);
+		put(SexeEnum.FEMALE.getCode(), 125);
 	}};
+	private static final List<String> JOBS = Arrays.asList("Chef.fe de projet", "Directeur.trice de projet",
+			"Développeur.euse Front", "Développeur.euse Back", "Développeur.euse Main Frame", "Développeur.euse ERP",
+			"Coach Agile", "Coach Lean", "Scrum Master", "Scrum Master / Product Owner", "Dev Full Stack", "Devops",
+			"Data analyst", "Ingénieur.e système", "Architecte", "Architecte réseau", "Développeur.se mobile",
+			"Designer", "Commercial.e", "Intégrateur.trice", "Responsable TMA", "Testeur.euse", "Analyste");
 	private static final List<String> CITIES = Arrays.asList("Lille", "Paris", "Bordeaux", "Nantes", "Rouen",
 			"Aix en Provence", "Bulgarie", "Strasbourg", "Lyon");
 
@@ -40,7 +46,7 @@ public class PeopleGenerator {
 	private LocalDateTime birthdayMinDate;
 	private LocalDateTime arrivalMaxDate;
 
-	PeopleGenerator() {
+	public PeopleGenerator() {
 		this.birthdayMinDate = LocalDateTime.of(1975, Month.JANUARY, 1, 0, 0);
 		this.arrivalMaxDate = LocalDateTime.now().minusMonths(3);
 		initSkillsMap();
@@ -84,6 +90,7 @@ public class PeopleGenerator {
 			people.setPhone(generatePhone());
 			people.setBirthDate(generateBirthdayDate());
 			people.setArrivalDate(generateArrivalDate());
+			people.setJob(JOBS.get((int) Math.floor(Math.random() * JOBS.size())));
 			people.setCity(CITIES.get((int) Math.floor(Math.random() * CITIES.size())));
 			people.setPictureIndex((int) Math.round(Math.random() * (MAP_MAX_PICTURE_INDEX_BY_SEX.get(people.getSex()) - 1)) + 1);
 			people.setLanguages(generateLanguages());

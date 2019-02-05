@@ -41,6 +41,7 @@ public class People {
 	private String city;
 	private Integer pictureIndex;
 	private String workPlace;
+	private String job;
 
 	@Column(name = "languages")
 	@ElementCollection

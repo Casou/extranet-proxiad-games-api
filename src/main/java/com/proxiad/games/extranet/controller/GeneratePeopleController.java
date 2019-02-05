@@ -26,7 +26,8 @@ public class GeneratePeopleController {
 	public ResponseEntity<?> generatePeople(@PathVariable("number") Integer numberOfPeople) {
 		List<People> people = peopleService.generateRandomPeople(numberOfPeople);
 		peopleService.generateIAEntry();
-		return new ResponseEntity<>(people.size() + " profiles randomly generated (+ IA profile)", HttpStatus.OK);
+		peopleService.generatePreviousTeamEntries();
+		return new ResponseEntity<>(people.size() + " profiles randomly generated (+ IA & previous team profiles)", HttpStatus.OK);
 	}
 
 }
