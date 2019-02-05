@@ -20,7 +20,7 @@ public enum LanguageEnum {
 	BRESILIEN("Brésilien", "bresil"),
 	CANADIEN("Canadien-Québécois", "canada"),
 	COREEN("Coréen", "coree"),
-	EGYPTIEN("Egypte", "egypte"),
+	EGYPTIEN("Égyptien", "egypte"),
 	GREC("Grec", "grece"),
 	INDIEN("Indien", "inde"),
 	ITALIEN("Italien", "italie"),
