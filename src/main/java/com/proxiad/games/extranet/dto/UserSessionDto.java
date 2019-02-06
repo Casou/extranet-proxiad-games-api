@@ -3,6 +3,8 @@ package com.proxiad.games.extranet.dto;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.proxiad.games.extranet.model.Text;
+
 import lombok.Builder;
 import lombok.Data;
 
@@ -16,5 +18,7 @@ public class UserSessionDto {
 	private Boolean isConnected;
 	@Builder.Default
 	private List<TerminalCommandDto> commands = new LinkedList<>();
+
+	private Text message;
 
 }

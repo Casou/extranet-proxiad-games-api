@@ -141,7 +141,7 @@ public class RoomController {
 
 		final Room room = optRoom.get();
 
-		final List<Text> trollTexts = textRepository.findAllByDiscriminant(TextEnum.TROLL);
+		final List<Text> trollTexts = textRepository.findAllByDiscriminantOrderByIdAsc(TextEnum.TROLL);
 
 		final Timer timer = Optional.ofNullable(room.getTimer()).orElseThrow(() -> new ProxiadControllerException("No timer found for the room " + room.getName()));
 		timer.setRemainingTime(Math.max(0, timer.getRemainingTime() - 120));

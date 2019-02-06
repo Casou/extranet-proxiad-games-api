@@ -12,5 +12,8 @@ public enum TextEnum {
 	PROGRESS_BAR,
 	TROLL,
 	TROLL_END,
+	ENIGMA,
+	LAST_ENIGMA,
+	OPEN_TERMINAL,
 
 }

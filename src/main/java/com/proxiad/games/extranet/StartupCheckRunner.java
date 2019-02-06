@@ -71,6 +71,21 @@ public class StartupCheckRunner implements CommandLineRunner {
 						.discriminant(TextEnum.TROLL_END)
 						.build()));
 
+		allTexts.stream().filter(text -> text.getDiscriminant().equals(TextEnum.LAST_ENIGMA))
+				.findAny()
+				.orElseGet(() -> textRepository.save(Text.builder()
+						.text("")
+						.voice("Google français")
+						.discriminant(TextEnum.LAST_ENIGMA)
+						.build()));
+
+		allTexts.stream().filter(text -> text.getDiscriminant().equals(TextEnum.OPEN_TERMINAL))
+				.findAny()
+				.orElseGet(() -> textRepository.save(Text.builder()
+						.text("")
+						.voice("Google français")
+						.discriminant(TextEnum.OPEN_TERMINAL)
+						.build()));
 	}
 
 }

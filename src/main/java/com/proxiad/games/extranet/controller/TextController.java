@@ -44,6 +44,12 @@ public class TextController {
 		return textRepository.save(new Text(TextEnum.PROGRESS_BAR));
 	}
 
+	@PostMapping("/enigma")
+	@AdminTokenSecurity
+	public Text createEnigma() {
+		return textRepository.save(new Text(TextEnum.ENIGMA));
+	}
+
 	@PatchMapping
 	@AdminTokenSecurity
 	public void updateSentence(@RequestBody TextDto introSentence) throws ProxiadControllerException {

@@ -13,8 +13,11 @@ import com.proxiad.games.extranet.dto.RoomSessionDto;
 import com.proxiad.games.extranet.dto.TerminalCommandDto;
 import com.proxiad.games.extranet.dto.TokenDto;
 import com.proxiad.games.extranet.dto.UserSessionDto;
+import com.proxiad.games.extranet.enums.TextEnum;
 import com.proxiad.games.extranet.model.Room;
+import com.proxiad.games.extranet.model.Text;
 import com.proxiad.games.extranet.repository.RoomRepository;
+import com.proxiad.games.extranet.repository.TextRepository;
 import com.proxiad.games.extranet.service.AuthService;
 
 @RestController
@@ -25,6 +28,9 @@ public class ClientController {
 
 	@Autowired
 	private RoomRepository roomRepository;
+
+	@Autowired
+	private TextRepository textRepository;
 
 	@Autowired
 	private SimpMessagingTemplate simpMessagingTemplate;
@@ -67,9 +73,12 @@ public class ClientController {
 
 	public void userConnected(String token, String sessionId) {
 		if (CONNECTED_USERS_TOKEN.containsKey(token)) {
+			Text text = textRepository.findAllByDiscriminantOrderByIdAsc(TextEnum.OPEN_TERMINAL).get(0);
+
 			UserSessionDto userSessionDto = CONNECTED_USERS_TOKEN.get(token);
 			userSessionDto.setSessionId(sessionId);
 			userSessionDto.setIsConnected(true);
+			userSessionDto.setMessage(text);
 			this.simpMessagingTemplate.convertAndSend("/topic/user/connected", userSessionDto);
 			this.simpMessagingTemplate.convertAndSend("/topic/user/" + userSessionDto.getRoomId() + "/connected", userSessionDto);
 			return;
@@ -79,11 +88,14 @@ public class ClientController {
 		Optional<TokenDto> optToken = authService.validateToken(token);
 
 		optToken.ifPresent(tokenDto -> {
+			Text text = textRepository.findAllByDiscriminantOrderByIdAsc(TextEnum.OPEN_TERMINAL).get(0);
+
 			UserSessionDto userSessionDto = UserSessionDto.builder()
 					.token(token)
 					.sessionId(sessionId)
 					.roomId(optRoom.orElse(new Room()).getId())
 					.isConnected(true)
+					.message(text)
 					.build();
 
 			CONNECTED_USERS_TOKEN.put(token, userSessionDto);

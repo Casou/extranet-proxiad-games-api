@@ -15,6 +15,6 @@ public interface TextRepository extends CrudRepository<Text, Integer> {
 
 	List<Text> findAllByOrderByIdAsc();
 
-	List<Text> findAllByDiscriminant(TextEnum discriminant);
+	List<Text> findAllByDiscriminantOrderByIdAsc(TextEnum discriminant);
 
 }

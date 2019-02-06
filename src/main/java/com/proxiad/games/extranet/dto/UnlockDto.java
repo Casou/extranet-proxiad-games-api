@@ -11,4 +11,8 @@ public class UnlockDto {
 	private String riddleId;
 	private Integer roomId;
 
+	private String message;
+	private String voice;
+	private Integer nbRiddlesResolved;
+
 }
