@@ -1,12 +1,12 @@
 package com.proxiad.games.extranet.model;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 
 @Data
 @Entity
@@ -18,7 +18,7 @@ public class Room {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer id;
 
-	@NonNull
+	@NotNull
 	private String name;
 
 	@OneToOne(fetch = FetchType.LAZY)
@@ -35,6 +35,9 @@ public class Room {
 
 	private Boolean isTerminated = false;
 	private String terminateStatus;
+
+	@NotNull
+	private Integer trollIndex = 0;
 
 	public boolean containsRiddle(String riddleId) {
 		return resolvedRiddles.stream().anyMatch(r -> r.getRiddleId().equals(riddleId));

@@ -18,12 +18,15 @@ import com.proxiad.games.extranet.dto.RiddleDto;
 import com.proxiad.games.extranet.dto.RoomDto;
 import com.proxiad.games.extranet.dto.RoomStatusDto;
 import com.proxiad.games.extranet.dto.RoomTrollDto;
+import com.proxiad.games.extranet.enums.TextEnum;
 import com.proxiad.games.extranet.exception.ProxiadControllerException;
 import com.proxiad.games.extranet.mapper.RoomMapper;
 import com.proxiad.games.extranet.model.Room;
+import com.proxiad.games.extranet.model.Text;
 import com.proxiad.games.extranet.model.Timer;
 import com.proxiad.games.extranet.repository.RiddleRepository;
 import com.proxiad.games.extranet.repository.RoomRepository;
+import com.proxiad.games.extranet.repository.TextRepository;
 import com.proxiad.games.extranet.service.RoomService;
 
 @RestController
@@ -38,6 +41,9 @@ public class RoomController {
 
 	@Autowired
 	private RoomRepository roomRepository;
+
+	@Autowired
+	private TextRepository textRepository;
 
 	@Autowired
 	private RoomMapper roomMapper;
@@ -117,6 +123,7 @@ public class RoomController {
 		room.setTimer(null);
 		room.setIsTerminated(false);
 		room.setTerminateStatus(null);
+		room.setTrollIndex(0);
 		roomRepository.save(room);
 
 		this.simpMessagingTemplate.convertAndSend("/topic/room/" + room.getId() + "/reinit", new RoomDto());
@@ -127,22 +134,30 @@ public class RoomController {
 	@GetMapping("/user/troll")
 	@BypassSecurity
 	public void troll(@RequestParam("salle") String roomName) throws ProxiadControllerException {
-		Optional<Room> optRoom = roomRepository.findByNameIgnoreCase(roomName);
+		final Optional<Room> optRoom = roomRepository.findByNameIgnoreCase(roomName);
 		if (!optRoom.isPresent()) {
 			throw new ProxiadControllerException("Your room is unknown. Please contact the administrator.");
 		}
 
-		Room room = optRoom.get();
+		final Room room = optRoom.get();
+
+		final List<Text> trollTexts = textRepository.findAllByDiscriminant(TextEnum.TROLL);
 
 		final Timer timer = Optional.ofNullable(room.getTimer()).orElseThrow(() -> new ProxiadControllerException("No timer found for the room " + room.getName()));
 		timer.setRemainingTime(Math.max(0, timer.getRemainingTime() - 120));
 		room.setTimer(timer);
+		final Integer trollIndex = room.getTrollIndex();
+		final Integer newTrollIndex = trollIndex + 1 >= trollTexts.size() ? trollTexts.size() - 1 : trollIndex + 1;
+		room.setTrollIndex(newTrollIndex);
 		roomRepository.save(room);
 
-		RoomTrollDto roomTrollDto = RoomTrollDto.builder()
+		final Text trollText = trollTexts.get(trollIndex);
+		final RoomTrollDto roomTrollDto = RoomTrollDto.builder()
 				.id(room.getId())
 				.name(room.getName())
 				.reduceTime(120)
+				.message(trollText.getText())
+				.videoName(trollText.getVideoName())
 				.build();
 
 		this.simpMessagingTemplate.convertAndSend("/topic/room/all/troll", roomTrollDto);

@@ -15,6 +15,8 @@ public class RoomTrollDto {
 
 	private Integer id;
 	private String name;
+	private String message;
+	private String videoName;
 	private Integer reduceTime;
 	private LocalDateTime startTime;
 	private Integer remainingTime;
