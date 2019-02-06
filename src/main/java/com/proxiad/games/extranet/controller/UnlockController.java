@@ -41,19 +41,19 @@ public class UnlockController {
 		final List<Riddle> allRiddles = riddleRepository.findAll();
 		final Optional<Riddle> optResolvedRiddle = allRiddles.stream().filter(riddle -> riddle.getRiddleId().equals(unlockDto.getRiddleId())
 				&& riddle.getRiddlePassword().equals(unlockDto.getPassword())).findFirst();
-//		if (!optResolvedRiddle.isPresent()) {
-//			return new ResponseEntity<>("Id and password don't match.", HttpStatus.FORBIDDEN);
-//		}
+		if (!optResolvedRiddle.isPresent()) {
+			return new ResponseEntity<>("Id and password don't match.", HttpStatus.FORBIDDEN);
+		}
 
 		Optional<Room> optRoom = roomRepository.findByToken(token);
-//		if (!optRoom.isPresent()) {
-//			return new ResponseEntity<>("Something is wrong with your token. Please clear the browser localStorage and login again.", HttpStatus.INTERNAL_SERVER_ERROR);
-//		}
+		if (!optRoom.isPresent()) {
+			return new ResponseEntity<>("Something is wrong with your token. Please clear the browser localStorage and login again.", HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 
 		Room room = optRoom.get();
 
 		Timer timer = room.getTimer();
-		if (!timer.getStatus().equals(TimerStatusEnum.STARTED)) {
+		if (timer == null || !timer.getStatus().equals(TimerStatusEnum.STARTED)) {
 			return new ResponseEntity<>("Timer is stopped.", HttpStatus.FORBIDDEN);
 		}
 
@@ -63,7 +63,7 @@ public class UnlockController {
 		}
 
 		final Text textToSend;
-		if (resolvedRiddles.size() == allRiddles.size()) {
+		if ((resolvedRiddles.size() + 1) == allRiddles.size()) {
 			textToSend = textRepository.findAllByDiscriminantOrderByIdAsc(TextEnum.LAST_ENIGMA).get(0);
 		} else {
 			textToSend = textRepository.findAllByDiscriminantOrderByIdAsc(TextEnum.ENIGMA).get(resolvedRiddles.size());
