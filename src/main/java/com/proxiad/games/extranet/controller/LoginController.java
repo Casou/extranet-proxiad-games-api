@@ -39,8 +39,7 @@ public class LoginController {
 	@PostMapping("/login")
 	@BypassSecurity
 	public ResponseEntity<?> login(@RequestBody LoginDto loginDto) {
-		if (loginDto == null
-				|| isEmpty(loginDto.getLogin())) {
+		if (loginDto == null || isEmpty(loginDto.getLogin())) {
 			return new ResponseEntity<>("Missing argument(s)", HttpStatus.BAD_REQUEST);
 		}
 
