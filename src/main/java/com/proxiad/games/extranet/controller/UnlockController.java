@@ -38,13 +38,6 @@ public class UnlockController {
 
 	@PostMapping("/unlock")
 	public ResponseEntity<?> unlockRiddle(@RequestBody UnlockDto unlockDto, @RequestAttribute String token) {
-		final List<Riddle> allRiddles = riddleRepository.findAll();
-		final Optional<Riddle> optResolvedRiddle = allRiddles.stream().filter(riddle -> riddle.getRiddleId().equals(unlockDto.getRiddleId())
-				&& riddle.getRiddlePassword().equals(unlockDto.getPassword())).findFirst();
-		if (!optResolvedRiddle.isPresent()) {
-			return new ResponseEntity<>("Id and password don't match.", HttpStatus.FORBIDDEN);
-		}
-
 		Optional<Room> optRoom = roomRepository.findByToken(token);
 		if (!optRoom.isPresent()) {
 			return new ResponseEntity<>("Something is wrong with your token. Please clear the browser localStorage and login again.", HttpStatus.INTERNAL_SERVER_ERROR);
@@ -60,6 +53,13 @@ public class UnlockController {
 		List<Riddle> resolvedRiddles = room.getResolvedRiddles();
 		if (resolvedRiddles.stream().anyMatch(riddle -> riddle.getRiddleId().equals(unlockDto.getRiddleId()))) {
 			return new ResponseEntity<>("Riddle already unlocked.", HttpStatus.FORBIDDEN);
+		}
+
+		final List<Riddle> allRiddles = riddleRepository.findAll();
+		final Optional<Riddle> optResolvedRiddle = allRiddles.stream().filter(riddle -> riddle.getRiddleId().equals(unlockDto.getRiddleId())
+				&& riddle.getRiddlePassword().equals(unlockDto.getPassword())).findFirst();
+		if (!optResolvedRiddle.isPresent()) {
+			return new ResponseEntity<>("Id and password don't match.", HttpStatus.BAD_REQUEST);
 		}
 
 		final Text textToSend;
