@@ -36,6 +36,7 @@ public class TimerWSController {
 		final Room room = getRoom(roomDto);
 
 		final Timer timer = Optional.ofNullable(room.getTimer()).orElse(new Timer());
+		timer.setStatus(TimerStatusEnum.INITIALIZING);
 		timer.setRemainingTime(Math.max(0, roomDto.getRemainingTime()));
 		room.setTimer(timer);
 		roomRepository.save(room);

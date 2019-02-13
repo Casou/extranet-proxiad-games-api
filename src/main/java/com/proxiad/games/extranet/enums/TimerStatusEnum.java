@@ -8,6 +8,7 @@ import lombok.Getter;
 @JsonFormat(shape = JsonFormat.Shape.STRING)
 public enum TimerStatusEnum {
 
+	INITIALIZING, // En train de lire la vidéo
 	STARTED,
 	PAUSED,
 	STOPPED

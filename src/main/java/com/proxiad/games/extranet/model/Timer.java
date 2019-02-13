@@ -17,7 +17,9 @@ public class Timer {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer id;
 
+	@Enumerated(EnumType.STRING)
 	private TimerStatusEnum status;
+
 	private LocalDateTime startTime;
 	private Integer remainingTime;
 
