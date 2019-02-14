@@ -3,14 +3,18 @@
 ## Installation des serveurs
 
 ### [API Rest](https://github.com/Casou/extranet-proxiad-games-api) 
-Il s'agit d'un projet Spring Boot à installer sur un serveur Proxiad (avec un nom de domaine si possible). 
+Il s'agit d'un projet Spring Boot à installer sur un serveur Proxiad (avec un nom de domaine si possible).
 Puis il suffit de lancer l'application, elle démarrera sur le **port 8000**.
+* Cloner le repository
+* Lancer la commande `mvn package` dans le dossier du projet
+* Lancer la commande `java -jar target/extranet-0.0.1-SNAPSHOT.jar` dans le dossier du projet
 
 ### [Extranet](https://github.com/Casou/extranet-proxiad-games)
 Il s'agit d'un projet React à installer soit sur un serveur Proxiad (avec un nom de domaine si possible)
 soit sur le PC connecté à internet.
  
-Il faut exécuter les commandes suivantes : 
+* Cloner le repository
+* Lancer les commandes suivantes dans le dossier du projet 
 ```
 npm install
 npm start
@@ -21,10 +25,11 @@ L'application se lancera sur le **port 3000**.
 Il s'agit d'un projet html qui se lance via un serveur HTTP. 
 A installer sur le Raspberry (pour IHM joueur) ainsi que sur un serveur Proxiad (avec un nom de domaine si possible) pour la régie.
 
-Il faut exécuter les commandes suivantes : 
+* Cloner le repository
+* Lancer les commandes suivantes dans le dossier du projet 
 ```
 npm install -g http-server
-http-server <path-to-folder> -p 9999
+http-server . -p 9999
 ```
 L'application se lancera sur le **port 9999**.
 
@@ -85,14 +90,4 @@ Dans le fichier `~/.config/lxsession/LXDE-pi/autostart`, ajouter les lignes suiv
 @xset s noblank
 @xset s noexpose
 @xset dpms 0 0
-```
-
-
-
-`chromium-browser --enable-speech-synthesis`
-
-```
-#!/bin/bash
-cd /var/www/ihm-ecran-proxiad-games && http-server . -p 9999 &
-chromium-browser --enable-speech-dispatcher -kiosk http://localhost:9999 &
 ```
