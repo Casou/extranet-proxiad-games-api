@@ -10,6 +10,7 @@ public class RoomMessageDto {
 
 	private Room room;
 	private String message;
+	private String voice;
 	private Text introSentence;
 
 }

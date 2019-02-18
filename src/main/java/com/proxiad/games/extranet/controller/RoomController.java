@@ -157,6 +157,7 @@ public class RoomController {
 				.name(room.getName())
 				.reduceTime(120)
 				.message(trollText.getText())
+				.voice(trollText.getVoice())
 				.videoName(trollText.getVideoName())
 				.build();
 
