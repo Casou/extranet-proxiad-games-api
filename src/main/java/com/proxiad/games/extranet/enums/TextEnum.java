@@ -15,5 +15,6 @@ public enum TextEnum {
 	ENIGMA,
 	LAST_ENIGMA,
 	OPEN_TERMINAL,
+	TAUNT,
 
 }

@@ -54,7 +54,7 @@ public class StartupCheckRunner implements CommandLineRunner {
 				.forEach(videoName -> textRepository.save(Text.builder()
 						.videoName(videoName)
 						.text("")
-						.voice("Google français")
+						.voice("French Female")
 						.discriminant(TextEnum.TROLL)
 						.build()));
 
@@ -67,7 +67,7 @@ public class StartupCheckRunner implements CommandLineRunner {
 				.findAny()
 				.orElseGet(() -> textRepository.save(Text.builder()
 						.text("")
-						.voice("Google français")
+						.voice("French Female")
 						.discriminant(TextEnum.TROLL_END)
 						.build()));
 
@@ -75,7 +75,7 @@ public class StartupCheckRunner implements CommandLineRunner {
 				.findAny()
 				.orElseGet(() -> textRepository.save(Text.builder()
 						.text("")
-						.voice("Google français")
+						.voice("French Female")
 						.discriminant(TextEnum.LAST_ENIGMA)
 						.build()));
 
@@ -83,7 +83,7 @@ public class StartupCheckRunner implements CommandLineRunner {
 				.findAny()
 				.orElseGet(() -> textRepository.save(Text.builder()
 						.text("")
-						.voice("Google français")
+						.voice("French Female")
 						.discriminant(TextEnum.OPEN_TERMINAL)
 						.build()));
 	}

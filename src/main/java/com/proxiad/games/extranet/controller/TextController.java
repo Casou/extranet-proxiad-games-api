@@ -50,6 +50,12 @@ public class TextController {
 		return textRepository.save(new Text(TextEnum.ENIGMA));
 	}
 
+	@PostMapping("/taunt")
+	@AdminTokenSecurity
+	public Text createTaunt() {
+		return textRepository.save(new Text(TextEnum.TAUNT));
+	}
+
 	@PatchMapping
 	@AdminTokenSecurity
 	public void updateSentence(@RequestBody TextDto introSentence) throws ProxiadControllerException {
