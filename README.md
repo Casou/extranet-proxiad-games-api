@@ -78,16 +78,16 @@ Pour lancer le navigateur en mode plein écran, éditer le fichier `/etc/xdg/lxs
 `@/usr/lib/chromium-browser/chromium-browser --start-fullscreen http://localhost:9999`
 
 #### Désactiver l'extinction automatique de l'écran
-Dans le fichier `/boot/config.txt`, ajouter les lignes suivantes : 
+* Installation des utilitaires X11 :
+`sudo apt-get install x11-xserver-utils`
+
+* Modification du fichier de configuration de LXDE
+    * Chercher et supprimer : `/etc/xdg/lxsession/LXDE/autostart` 
+    * Ajouter les lignes :
 ```
-# power down monitor when lockscreen enabled
-hdmi_blanking=1
+@xset s off
+@xset -dpms
+@xset s noblank
 ```
 
-Dans le fichier `~/.config/lxsession/LXDE-pi/autostart`, ajouter les lignes suivantes :
-```
-@xset s 0 0
-@xset s noblank
-@xset s noexpose
-@xset dpms 0 0
-```
+* Redémarrer le Raspberry
