@@ -12,17 +12,15 @@ import java.io.*;
 @Slf4j
 public class CustomLogResponseWrapper extends HttpServletResponseWrapper {
 
-    TeeServletOutputStream teeStream;
+    private TeeServletOutputStream teeStream;
+    private PrintWriter teeWriter;
+    private ByteArrayOutputStream bos;
 
-    PrintWriter teeWriter;
-
-    ByteArrayOutputStream bos;
-
-    public CustomLogResponseWrapper(HttpServletResponse response) {
+    CustomLogResponseWrapper(HttpServletResponse response) {
         super(response);
     }
 
-    public String getContent() throws IOException {
+    String getContent() {
         return bos == null ? "" : bos.toString();
     }
 
@@ -49,11 +47,11 @@ public class CustomLogResponseWrapper extends HttpServletResponseWrapper {
     public void flushBuffer() throws IOException {
         if (teeStream != null) {
             teeStream.flush();
-            System.err.println("teeStream flush");
+            log.warn("teeStream flush");
         }
         if (this.teeWriter != null) {
             this.teeWriter.flush();
-            System.err.println("teeWriter flush");
+            log.warn("teeWriter flush");
         }
     }
 
@@ -61,7 +59,7 @@ public class CustomLogResponseWrapper extends HttpServletResponseWrapper {
 
         private final TeeOutputStream targetStream;
 
-        public TeeServletOutputStream(OutputStream one, OutputStream two) {
+        TeeServletOutputStream(OutputStream one, OutputStream two) {
             targetStream = new TeeOutputStream(one, two);
         }
 
