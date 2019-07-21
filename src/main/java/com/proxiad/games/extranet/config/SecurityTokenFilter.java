@@ -50,10 +50,10 @@ public class SecurityTokenFilter extends GenericFilterBean {
     @Value("${extranet.admin.token}")
     private String adminToken;
 
-    @Value("${logging.custom.request.level:NONE}")
-    private String requestLogLevel;
-    @Value("${logging.custom.response.level:NONE}")
-    private String responseLogLevel;
+    @Value("${logging.custom.request.level}")
+    private CustomLogLevel requestLogLevel = CustomLogLevel.NONE;
+    @Value("${logging.custom.response.level}")
+    private CustomLogLevel responseLogLevel = CustomLogLevel.NONE;
 
     @Bean
     @Primary
@@ -139,13 +139,11 @@ public class SecurityTokenFilter extends GenericFilterBean {
     }
 
     private void logRequest(CustomLogRequestWrapper requestWrapper) {
-        CustomLogLevel logLevel = CustomLogLevel.valueOf(requestLogLevel);
-
-        if (logLevel == CustomLogLevel.NONE) {
+        if (requestLogLevel == CustomLogLevel.NONE) {
             return;
         }
 
-        if (logLevel == CustomLogLevel.BASIC) {
+        if (requestLogLevel == CustomLogLevel.BASIC) {
             log.debug("REST Request : " + requestWrapper.getRequestURI());
             return;
         }
@@ -176,15 +174,12 @@ public class SecurityTokenFilter extends GenericFilterBean {
 
     private void logResponse(CustomLogResponseWrapper responseWrapper, CustomLogRequestWrapper requestWrapper, String customText)
             throws IOException {
-        CustomLogLevel logLevel = CustomLogLevel.valueOf(requestLogLevel);
-
-        if (logLevel == CustomLogLevel.NONE) {
+        if (requestLogLevel == CustomLogLevel.NONE) {
             return;
         }
 
         String customTextFormatted = StringUtils.isEmpty(customText) ? "" : String.format(" (%s)", customText);
-
-        if (logLevel == CustomLogLevel.BASIC) {
+        if (requestLogLevel == CustomLogLevel.BASIC) {
             log.debug(String.format("REST Response : %s - %s%s", requestWrapper.getRequestURI(),
                     HttpStatus.valueOf(responseWrapper.getStatus()), customTextFormatted));
             return;

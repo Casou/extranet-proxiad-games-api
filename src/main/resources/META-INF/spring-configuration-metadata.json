@@ -1,0 +1,16 @@
+{
+  "properties": [
+    { "name": "extranet.password", "type": "java.lang.String" },
+    { "name": "extranet.admin.token", "type": "java.lang.String" },
+    { "name": "application.allVideos", "type": "java.lang.String" },
+    { "name": "logging.commonsRequestLoggingFilter.includeQueryString", "type": "java.lang.Boolean" },
+    { "name": "logging.commonsRequestLoggingFilter.includeHeaders", "type": "java.lang.Boolean" },
+    { "name": "logging.commonsRequestLoggingFilter.includePayload", "type": "java.lang.Boolean" },
+    { "name": "logging.commonsRequestLoggingFilter.includeClientInfo", "type": "java.lang.Boolean" },
+    { "name": "logging.commonsRequestLoggingFilter.maxPayloadLength", "type": "java.lang.Integer" },
+    { "name": "logging.commonsRequestLoggingFilter.beforeMessagePrefix", "type": "java.lang.String" },
+    { "name": "logging.commonsRequestLoggingFilter.afterMessagePrefix", "type": "java.lang.String" },
+    { "name": "logging.custom.request.level", "type": "com.proxiad.games.extranet.config.CustomLogLevel" },
+    { "name": "logging.custom.response.level", "type": "com.proxiad.games.extranet.config.CustomLogLevel" }
+  ]
+}

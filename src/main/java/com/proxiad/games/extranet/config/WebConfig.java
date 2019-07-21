@@ -1,6 +1,7 @@
 package com.proxiad.games.extranet.config;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.StringUtils;
@@ -12,18 +13,19 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 @EnableWebMvc
+@ConfigurationProperties
 public class WebConfig implements WebMvcConfigurer {
 
 	@Value("${logging.commonsRequestLoggingFilter.includeQueryString:false}")
-	private String includeQueryString;
+	private Boolean includeQueryString;
 	@Value("${logging.commonsRequestLoggingFilter.includeHeaders:false}")
-	private String includeHeaders;
+	private Boolean includeHeaders;
 	@Value("${logging.commonsRequestLoggingFilter.includePayload:false}")
-	private String includePayload;
+	private Boolean includePayload;
 	@Value("${logging.commonsRequestLoggingFilter.includeClientInfo:false}")
-	private String includeClientInfo;
+	private Boolean includeClientInfo;
 	@Value("${logging.commonsRequestLoggingFilter.maxPayloadLength:10000}")
-	private String maxPayloadLength;
+	private Integer maxPayloadLength;
 	@Value("${logging.commonsRequestLoggingFilter.beforeMessagePrefix:}")
 	private String beforeMessagePrefix;
 	@Value("${logging.commonsRequestLoggingFilter.afterMessagePrefix:}")
@@ -44,11 +46,11 @@ public class WebConfig implements WebMvcConfigurer {
     @Bean
     public CommonsRequestLoggingFilter requestLoggingFilter() {
         CommonsRequestLoggingFilter filter = new CommonsRequestLoggingFilter();
-        filter.setIncludeQueryString(Boolean.valueOf(includeQueryString));
-        filter.setIncludePayload(Boolean.valueOf(includePayload));
-        filter.setMaxPayloadLength(Integer.valueOf(maxPayloadLength));
-        filter.setIncludeHeaders(Boolean.valueOf(includeHeaders));
-        filter.setIncludeClientInfo(Boolean.valueOf(includeClientInfo));
+        filter.setIncludeQueryString(includeQueryString);
+        filter.setIncludePayload(includePayload);
+        filter.setMaxPayloadLength(maxPayloadLength);
+        filter.setIncludeHeaders(includeHeaders);
+        filter.setIncludeClientInfo(includeClientInfo);
         if (!StringUtils.isEmpty(beforeMessagePrefix)) {
             filter.setBeforeMessagePrefix(beforeMessagePrefix);
         }
