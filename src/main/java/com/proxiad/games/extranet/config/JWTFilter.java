@@ -12,9 +12,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.web.filter.GenericFilterBean;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
@@ -28,82 +32,94 @@ import com.proxiad.games.extranet.service.AuthService;
 import com.proxiad.games.extranet.utils.URIPatternMatchers;
 
 @Configuration
+@Slf4j
 public class JWTFilter extends GenericFilterBean {
 
-	@Autowired
-	private AuthService authService;
+    @Autowired
+    private AuthService authService;
 
-	@Autowired
-	private RoomRepository roomRepository;
+    @Autowired
+    private RoomRepository roomRepository;
 
-	@Autowired
-	private RequestMappingHandlerMapping handlerMapping;
+    @Autowired
+    @Qualifier("handlerMapping")
+    private RequestMappingHandlerMapping handlerMapping;
 
-	@Value("${extranet.admin.token}")
-	private String adminToken;
+    @Value("${extranet.admin.token}")
+    private String adminToken;
 
-	@Override
-	public void doFilter(ServletRequest req, ServletResponse res, FilterChain filterChain) throws IOException, ServletException {
-		final HttpServletRequest request = (HttpServletRequest) req;
-		final HttpServletResponse response = (HttpServletResponse) res;
-		String token = request.getHeader("Authorization");
-		if (token == null && request.getParameter("token") != null) {
-			token = request.getParameter("token");
-		}
+    @Bean
+    @Primary
+    public RequestMappingHandlerMapping handlerMapping() {
+        return new RequestMappingHandlerMapping();
+    }
 
-		final String uri = request.getRequestURI();
+    @Override
+    public void doFilter(ServletRequest req, ServletResponse res, FilterChain filterChain) throws IOException, ServletException {
+        final HttpServletRequest request = (HttpServletRequest) req;
+        final HttpServletResponse response = (HttpServletResponse) res;
+        String token = request.getHeader("Authorization");
+        if (token == null && request.getParameter("token") != null) {
+            token = request.getParameter("token");
+        }
 
-		if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
-			response.sendError(HttpServletResponse.SC_OK, "success");
-			return;
-		}
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            response.sendError(HttpServletResponse.SC_OK, "success");
+            return;
+        }
 
-		List<Map.Entry<RequestMappingInfo, HandlerMethod>> filteredMethods = handlerMapping.getHandlerMethods().entrySet().stream()
-				.filter(entry -> URIPatternMatchers.matches(uri, entry.getKey().getPatternsCondition().getPatterns().iterator().next()))
-				.collect(Collectors.toList());
-		HandlerMethod handlerMethod = filteredMethods.size() > 0 ? filteredMethods.get(0).getValue() : null;
+        final String uri = request.getRequestURI();
 
-		if (allowRequestWithoutToken(request, handlerMethod)) {
-			response.setStatus(HttpServletResponse.SC_OK);
-			filterChain.doFilter(req, res);
-			return;
-		}
+        List<Map.Entry<RequestMappingInfo, HandlerMethod>> filteredMethods = handlerMapping.getHandlerMethods().entrySet().stream()
+                .filter(entry -> URIPatternMatchers.matches(uri, entry.getKey().getPatternsCondition().getPatterns().iterator().next()))
+                .collect(Collectors.toList());
+        HandlerMethod handlerMethod = filteredMethods.size() > 0 ? filteredMethods.get(0).getValue() : null;
 
-		if (token == null) {
-			response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-			return;
-		}
+        if (allowRequestWithoutToken(request, handlerMethod)) {
+            response.setStatus(HttpServletResponse.SC_OK);
+            filterChain.doFilter(req, res);
+            return;
+        }
 
-		if (allowRequestWithSpecialToken(handlerMethod, token)) {
-			response.setStatus(HttpServletResponse.SC_OK);
-			filterChain.doFilter(req, res);
-			return;
-		}
+        if (token == null) {
+            log.warn(String.format("401 Request unauthorized (token is null) for uri : %s", uri));
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
+        }
 
-		Optional<TokenDto> optionalToken = this.authService.validateToken(token);
-		if (!optionalToken.isPresent()) {
-			response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-			return;
-		}
+        if (allowRequestWithSpecialToken(handlerMethod, token)) {
+            response.setStatus(HttpServletResponse.SC_OK);
+            filterChain.doFilter(req, res);
+            return;
+        }
 
-		request.setAttribute("token", token);
-		request.setAttribute("room", roomRepository.findByToken(token));
+        Optional<TokenDto> optionalToken = this.authService.validateToken(token);
+        if (!optionalToken.isPresent()) {
+            log.warn(String.format("401 Request unauthorized (token is not valid) for token %s and uri : %s", token, uri));
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
+        }
 
-		filterChain.doFilter(req, res);
-	}
+        request.setAttribute("token", token);
+        request.setAttribute("room", roomRepository.findByToken(token));
 
-	private boolean allowRequestWithSpecialToken(HandlerMethod handlerMethod, String tokenString) {
-		if (handlerMethod != null && handlerMethod.getMethodAnnotation(AdminTokenSecurity.class) != null) {
-			return tokenString.equals(adminToken);
-		}
+        filterChain.doFilter(req, res);
+    }
 
-		return false;
-	}
+    private boolean allowRequestWithSpecialToken(HandlerMethod handlerMethod, String tokenString) {
+        if (handlerMethod != null && handlerMethod.getMethodAnnotation(AdminTokenSecurity.class) != null) {
+            return tokenString.equals(adminToken);
+        }
 
-	private boolean allowRequestWithoutToken(HttpServletRequest request, HandlerMethod handlerMethod) {
-		return request.getRequestURI().contains("/console")
-				|| request.getRequestURI().contains("/ws")
-				|| (handlerMethod != null && handlerMethod.getMethodAnnotation(BypassSecurity.class) != null);
-	}
+        return false;
+    }
+
+    private boolean allowRequestWithoutToken(HttpServletRequest request, HandlerMethod handlerMethod) {
+        return request.getRequestURI().contains("/console")
+                || request.getRequestURI().contains("/ws")
+                || request.getRequestURI().contains("/actuator")
+                || request.getRequestURI().contains("/favicon.ico")
+                || (handlerMethod != null && handlerMethod.getMethodAnnotation(BypassSecurity.class) != null);
+    }
 
 }

@@ -33,6 +33,9 @@ public class StartupCheckRunner implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) {
+		log.info("******************************************");
+		log.info("********** Startup check runner **********\n\n\n");
+
 		List<String> unexistingParameters = parameterRepository.findAll().stream()
 				.map(Parameter::getKey)
 				.filter(parameterKey -> !ParameterEnum.findByKey(parameterKey).isPresent())
@@ -43,6 +46,9 @@ public class StartupCheckRunner implements CommandLineRunner {
 		}
 
 		manageTrollTexts();
+
+		log.info("******************************************");
+		log.info("******************************************");
 	}
 
 	private void manageTrollTexts() {

@@ -10,8 +10,8 @@ public class PingController {
 
 	@GetMapping("/ping")
 	@BypassSecurity
-	public void ping() {
-
+	public String ping() {
+		return "pong";
 	}
 
 }

@@ -42,7 +42,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     }
 
 	@EventListener(SessionConnectEvent.class)
-	public void handleWebsocketConnectListner(SessionConnectEvent event) {
+	public void handleWebsocketConnectListener(SessionConnectEvent event) {
 		GenericMessage message = (GenericMessage) event.getMessage();
 
 		MessageHeaders headers = message.getHeaders();
@@ -89,7 +89,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 	}
 
 	@EventListener(SessionDisconnectEvent.class)
-	public void handleWebsocketDisconnectListner(SessionDisconnectEvent event) {
+	public void handleWebsocketDisconnectListener(SessionDisconnectEvent event) {
 		Optional<String> optToken = wsUserController.userDisconnected(event.getSessionId());
 		optToken.ifPresent(token -> log.info("User disconnected [" + optToken + ", " + event.getSessionId() + "] : " + event));
 
