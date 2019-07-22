@@ -1,13 +1,14 @@
 package com.proxiad.games.extranet.config;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.client.ResourceAccessException;
-
 import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import java.io.*;
+
+import org.springframework.web.client.ResourceAccessException;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class CustomLogRequestWrapper extends HttpServletRequestWrapper {
@@ -26,13 +27,10 @@ public class CustomLogRequestWrapper extends HttpServletRequestWrapper {
             if (inputStream != null) {
                 bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
                 char[] charBuffer = new char[128];
-                int bytesRead = -1;
+                int bytesRead;
                 while ((bytesRead = bufferedReader.read(charBuffer)) > 0) {
                     stringBuilder.append(charBuffer, 0, bytesRead);
                 }
-            } else {
-                // make an empty string since there is no payload
-                stringBuilder.append("");
             }
         } catch (IOException ex) {
             log.error("Error reading the request payload", ex);
@@ -52,7 +50,7 @@ public class CustomLogRequestWrapper extends HttpServletRequestWrapper {
     @Override
     public ServletInputStream getInputStream() throws IOException {
         final ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(payload.getBytes());
-        ServletInputStream inputStream = new ServletInputStream() {
+        return new ServletInputStream() {
             @Override
             public boolean isFinished() {
                 return byteArrayInputStream.available() == 0;
@@ -73,6 +71,5 @@ public class CustomLogRequestWrapper extends HttpServletRequestWrapper {
                 return byteArrayInputStream.read();
             }
         };
-        return inputStream;
     }
 }

@@ -1,12 +1,18 @@
 package com.proxiad.games.extranet.config;
 
-import com.proxiad.games.extranet.annotation.AdminTokenSecurity;
-import com.proxiad.games.extranet.annotation.BypassSecurity;
-import com.proxiad.games.extranet.dto.TokenDto;
-import com.proxiad.games.extranet.repository.RoomRepository;
-import com.proxiad.games.extranet.service.AuthService;
-import com.proxiad.games.extranet.utils.URIPatternMatchers;
-import lombok.extern.slf4j.Slf4j;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,18 +26,14 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import com.proxiad.games.extranet.annotation.AdminTokenSecurity;
+import com.proxiad.games.extranet.annotation.BypassSecurity;
+import com.proxiad.games.extranet.dto.TokenDto;
+import com.proxiad.games.extranet.repository.RoomRepository;
+import com.proxiad.games.extranet.service.AuthService;
+import com.proxiad.games.extranet.utils.URIPatternMatchers;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Configuration
 @Slf4j
@@ -80,6 +82,7 @@ public class SecurityTokenFilter extends GenericFilterBean {
 
         List<Map.Entry<RequestMappingInfo, HandlerMethod>> filteredMethods = handlerMapping.getHandlerMethods().entrySet().stream()
                 .filter(entry -> URIPatternMatchers.matches(uri, entry.getKey().getPatternsCondition().getPatterns().iterator().next()))
+                .filter(entry -> entry.getKey().getMethodsCondition().getMethods().stream().anyMatch(methodType -> methodType.name().equals(request.getMethod())))
                 .collect(Collectors.toList());
         HandlerMethod handlerMethod = filteredMethods.size() > 0 ? filteredMethods.get(0).getValue() : null;
 
@@ -90,7 +93,7 @@ public class SecurityTokenFilter extends GenericFilterBean {
 
         if (allowRequestWithoutToken(request, handlerMethod)) {
             response.setStatus(HttpServletResponse.SC_OK);
-            filterChain.doFilter(servletRequest, responseWrapper);
+            filterChain.doFilter(requestWrapper, responseWrapper);
             logResponse(responseWrapper, requestWrapper);
             return;
         }
@@ -103,7 +106,7 @@ public class SecurityTokenFilter extends GenericFilterBean {
 
         if (allowRequestWithSpecialToken(handlerMethod, token)) {
             response.setStatus(HttpServletResponse.SC_OK);
-            filterChain.doFilter(servletRequest, responseWrapper);
+            filterChain.doFilter(requestWrapper, responseWrapper);
             logResponse(responseWrapper, requestWrapper);
             return;
         }
@@ -118,7 +121,7 @@ public class SecurityTokenFilter extends GenericFilterBean {
         request.setAttribute("token", token);
         request.setAttribute("room", roomRepository.findByToken(token));
 
-        filterChain.doFilter(servletRequest, responseWrapper);
+        filterChain.doFilter(requestWrapper, responseWrapper);
         logResponse(responseWrapper, requestWrapper);
     }
 
@@ -158,12 +161,11 @@ public class SecurityTokenFilter extends GenericFilterBean {
         }
 
         log.debug("\n -----------------REST Request Detail-------------------------"
-                + " \n RequestURI :: " + requestWrapper.getRequestURI()
+                + " \n RequestURI :: " + requestWrapper.getMethod() + " " + requestWrapper.getRequestURI()
                 + " \n REMOTE ADDRESS :: " + requestWrapper.getRemoteAddr()
                 + " \n HEADERS :: [ " + headersString + " ] "
                 + " \n REQUEST BODY Size :: " + requestWrapper.payload.length() + " bytes"
                 + " \n REQUEST BODY :: " + requestWrapper.payload
-                + " \n HTTP METHOD :: " + requestWrapper.getMethod()
                 + " \n ContentType :: " + requestWrapper.getContentType());
     }
 
