@@ -1,2 +1,23 @@
-#!/usr/bin/env bash
+#!/bin/bash
+
+BRANCH=`git rev-parse --abbrev-ref HEAD`
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+printf "\n\n${YELLOW}POST MERGE HOOK${NC}\n"
+printf "${BLUE}mvn clean package${NC}\n"
+
 mvn clean package
+
+RESULT=$?
+if [ $RESULT -ne 0 ]; then
+      printf "${RED}POST MERGE KO. Exit code : ${RESULT}${NC}\n"
+      exit $RESULT
+fi
+
+printf "${GREEN}POST MERGE OK${NC}\n"
+exit 0
