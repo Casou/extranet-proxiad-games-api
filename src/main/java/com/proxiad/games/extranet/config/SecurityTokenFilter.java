@@ -81,8 +81,8 @@ public class SecurityTokenFilter extends GenericFilterBean {
         final String uri = request.getRequestURI();
 
         List<Map.Entry<RequestMappingInfo, HandlerMethod>> filteredMethods = handlerMapping.getHandlerMethods().entrySet().stream()
-                .filter(entry -> URIPatternMatchers.matches(uri, entry.getKey().getPatternsCondition().getPatterns().iterator().next()))
-                .filter(entry -> entry.getKey().getMethodsCondition().getMethods().stream().anyMatch(methodType -> methodType.name().equals(request.getMethod())))
+                .filter(entry -> matchUri(uri, entry))
+                .filter(entry -> matchMethod(request, entry))
                 .collect(Collectors.toList());
         HandlerMethod handlerMethod = filteredMethods.size() > 0 ? filteredMethods.get(0).getValue() : null;
 
@@ -125,6 +125,16 @@ public class SecurityTokenFilter extends GenericFilterBean {
         logResponse(responseWrapper, requestWrapper);
     }
 
+    private boolean matchUri(String uri, Map.Entry<RequestMappingInfo, HandlerMethod> entry) {
+        return URIPatternMatchers.matches(uri, entry.getKey().getPatternsCondition().getPatterns().iterator().next());
+    }
+
+    private boolean matchMethod(HttpServletRequest request, Map.Entry<RequestMappingInfo, HandlerMethod> entry) {
+        return entry.getKey().getMethodsCondition().getMethods().size() == 0 ||
+                entry.getKey().getMethodsCondition().getMethods().stream()
+                        .anyMatch(methodType -> methodType.name().equals(request.getMethod()));
+    }
+
     private boolean allowRequestWithSpecialToken(HandlerMethod handlerMethod, String tokenString) {
         if (handlerMethod != null && handlerMethod.getMethodAnnotation(AdminTokenSecurity.class) != null) {
             return tokenString.equals(adminToken);
@@ -147,7 +157,7 @@ public class SecurityTokenFilter extends GenericFilterBean {
         }
 
         if (requestLogLevel == CustomLogLevel.BASIC) {
-            log.debug("REST Request : " + requestWrapper.getRequestURI());
+            log.debug("REST Request : " + requestWrapper.getMethod() + " " + requestWrapper.getRequestURI());
             return;
         }
 
