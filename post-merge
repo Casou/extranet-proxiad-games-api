@@ -1,2 +1,5 @@
 #!/bin/sh
+echo POST MERGE HOOK
+echo mvn clean package
 mvn clean package
+exit $?
