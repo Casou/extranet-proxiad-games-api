@@ -8,16 +8,16 @@ YELLOW='\033[0;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-printf "${YELLOW}POST MERGE HOOK${NC}\n"
+printf "\n\n${YELLOW}POST MERGE HOOK${NC}\n"
 printf "${BLUE}mvn clean package${NC}\n"
 
 mvn clean package
 
 RESULT=$?
 if [ $RESULT -ne 0 ]; then
-      printf "${RED}Exit code : ${RESULT}${NC}\n"
+      printf "${RED}POST MERGE KO. Exit code : ${RESULT}${NC}\n"
       exit $RESULT
 fi
 
-printf "${GREEN}Exit 0${NC}\n"
+printf "${GREEN}POST MERGE OK${NC}\n"
 exit 0
