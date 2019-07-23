@@ -1,17 +1,20 @@
-# [Proxiad Games] API pour le fake extranet
+# [Proxiad Games] Escape Game
 
-## Installation des serveurs
+## Installation des postes
 
-### [API Rest](https://github.com/Casou/extranet-proxiad-games-api) 
-Il s'agit d'un projet Spring Boot à installer sur un serveur Proxiad (avec un nom de domaine si possible).
-Puis il suffit de lancer l'application, elle démarrera sur le **port 8000**.
+### [API Rest + Serveur WebSocket](https://github.com/Casou/extranet-proxiad-games-api)
+Il s'agit d'un projet Spring Boot à installer sur le Raspberry Pi. Puis il suffit de lancer l'application, elle démarrera sur le **port 8000**.
 * Cloner le repository
 * Lancer la commande `mvn package` dans le dossier du projet
 * Lancer la commande `java -jar target/extranet-0.0.1-SNAPSHOT.jar` dans le dossier du projet
 
-### [Extranet](https://github.com/Casou/extranet-proxiad-games)
-Il s'agit d'un projet React à installer soit sur un serveur Proxiad (avec un nom de domaine si possible)
-soit sur le PC connecté à internet.
+Pour inclure un `application.properties` personnalisé au moment du lancement, vous pouvez lancer la commande :
+```
+java -Dspring.config.location=target\application.properties -jar target\extranet-0.0.1-SNAPSHOT.jar
+```
+
+### [Fake Extranet](https://github.com/Casou/extranet-proxiad-games)
+Il s'agit d'un projet React à installer soit sur le PC connecté à internet (PC portable donné aux joueurs).
  
 * Cloner le repository
 * Lancer les commandes suivantes dans le dossier du projet 
@@ -22,8 +25,7 @@ npm start
 L'application se lancera sur le **port 3000**.
 
 ### [IHM joueurs / régie](https://github.com/Casou/ihm-ecran-proxiad-games)
-Il s'agit d'un projet html qui se lance via un serveur HTTP. 
-A installer sur le Raspberry (pour IHM joueur) ainsi que sur un serveur Proxiad (avec un nom de domaine si possible) pour la régie.
+Il s'agit d'un projet html à installer sur le PC d'affichage du compteur (PC portable branché sur l'écran). Il se lance via un serveur HTTP.
 
 * Cloner le repository
 * Lancer les commandes suivantes dans le dossier du projet 
@@ -31,7 +33,16 @@ A installer sur le Raspberry (pour IHM joueur) ainsi que sur un serveur Proxiad 
 npm install -g http-server
 http-server . -p 9999
 ```
-L'application se lancera sur le **port 9999**.
+L'application se lancera sur le **port 9999**. Les urls sont :
+* [http://localhost:9999](http://localhost:9999) pour l'affichage du compteur.
+* [http://localhost:9999/admin.html](http://localhost:9999/admin.html) pour la régie.
+
+#### Alternative
+Si npm ne veut pas installer http-server, vous pouvez installer Python 3.7 et lancer la commande :
+```
+cd <path>
+py -m http.server 9999
+```
 
 ## Préparation du matériel
 

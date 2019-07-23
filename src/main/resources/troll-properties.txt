@@ -1,2 +1,2 @@
-server:http://localhost:8000/troll
-salle:toto
+server:http://192.168.240.104:8000/user/troll
+salle:tokyo

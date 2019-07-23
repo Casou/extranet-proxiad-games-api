@@ -131,7 +131,7 @@ public class RoomController {
 		return new ResponseEntity<>(roomMapper.toDto(room), HttpStatus.OK);
 	}
 
-	@GetMapping("/user/troll")
+	@RequestMapping("/user/troll")
 	@BypassSecurity
 	public void troll(@RequestParam("salle") String roomName) throws ProxiadControllerException {
 		final Optional<Room> optRoom = roomRepository.findByNameIgnoreCase(roomName);

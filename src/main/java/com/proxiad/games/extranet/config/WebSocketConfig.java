@@ -1,24 +1,22 @@
 package com.proxiad.games.extranet.config;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
+import com.proxiad.games.extranet.controller.ClientController;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.MessageHeaders;
+import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.messaging.support.GenericMessage;
 import org.springframework.util.StringUtils;
-import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
-import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
-import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
+import org.springframework.web.socket.config.annotation.*;
 import org.springframework.web.socket.messaging.SessionConnectEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
-import com.proxiad.games.extranet.controller.ClientController;
-
-import lombok.extern.slf4j.Slf4j;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Configuration
 @EnableWebSocketMessageBroker
@@ -31,6 +29,11 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 	@Autowired
 	private ClientController wsUserController;
 
+	@Override
+	public void configureMessageBroker(MessageBrokerRegistry registry) {
+        registry.configureBrokerChannel().interceptors(new WebSocketMessageLogger());
+	}
+
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
@@ -42,7 +45,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     }
 
 	@EventListener(SessionConnectEvent.class)
-	public void handleWebsocketConnectListner(SessionConnectEvent event) {
+	public void handleWebsocketConnectListener(SessionConnectEvent event) {
 		GenericMessage message = (GenericMessage) event.getMessage();
 
 		MessageHeaders headers = message.getHeaders();
@@ -51,13 +54,13 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 			log.info("Received a new web socket connection (no header) : " + event);
 		}
 
-		Optional<Map> nativeHeaders = Optional.of((Map) headers.get("nativeHeaders"));
+		Optional<Map> nativeHeaders = Optional.ofNullable((Map) headers.get("nativeHeaders"));
 		if (!nativeHeaders.isPresent()) {
 			log.info("Received a new web socket connection (no native header) : " + event);
 		}
 
-		checkToken(event, sessionId, nativeHeaders.get());
-		checkRoomToken(event, sessionId, nativeHeaders.get());
+		checkToken(event, sessionId, nativeHeaders.orElse(new HashMap()));
+		checkRoomToken(event, sessionId, nativeHeaders.orElse(new HashMap()));
 
 		log.info("Received a new web socket connection from [" + sessionId + "] : " + event);
 	}
@@ -89,7 +92,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 	}
 
 	@EventListener(SessionDisconnectEvent.class)
-	public void handleWebsocketDisconnectListner(SessionDisconnectEvent event) {
+	public void handleWebsocketDisconnectListener(SessionDisconnectEvent event) {
 		Optional<String> optToken = wsUserController.userDisconnected(event.getSessionId());
 		optToken.ifPresent(token -> log.info("User disconnected [" + optToken + ", " + event.getSessionId() + "] : " + event));
 
