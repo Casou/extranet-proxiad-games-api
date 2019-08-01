@@ -161,7 +161,7 @@ public class RoomController {
 				.videoName(trollText.getVideoName())
 				.build();
 
-		this.simpMessagingTemplate.convertAndSend("/topic/room/all/troll", roomTrollDto);
+		this.simpMessagingTemplate.convertAndSend("/topic/room/admin/troll", roomTrollDto);
 		this.simpMessagingTemplate.convertAndSend("/topic/room/" + room.getId() + "/troll", roomTrollDto);
 	}
 

@@ -64,7 +64,7 @@ public class RedPillController {
 		roomRepository.save(room);
 
 		this.simpMessagingTemplate.convertAndSend("/topic/room/" + room.getId() + "/terminate", new RoomDto());
-		this.simpMessagingTemplate.convertAndSend("/topic/room/all/success", roomMapper.toDto(room));
+		this.simpMessagingTemplate.convertAndSend("/topic/room/admin/success", roomMapper.toDto(room));
 
 		return new ResponseEntity<>("Access granted", HttpStatus.OK);
 	}

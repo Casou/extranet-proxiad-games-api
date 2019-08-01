@@ -41,7 +41,7 @@ public class TimerWSController {
 		room.setTimer(timer);
 		roomRepository.save(room);
 
-		this.simpMessagingTemplate.convertAndSend("/topic/room/all/start", roomDto);
+		this.simpMessagingTemplate.convertAndSend("/topic/room/admin/start", roomDto);
 		this.simpMessagingTemplate.convertAndSend("/topic/room/" + roomDto.getId() + "/start", roomDto);
 	}
 
@@ -55,11 +55,11 @@ public class TimerWSController {
 		room.setTimer(timer);
 		roomRepository.save(room);
 
-		this.simpMessagingTemplate.convertAndSend("/topic/room/all/startTimer", roomMapper.toDto(room));
+		this.simpMessagingTemplate.convertAndSend("/topic/room/admin/startTimer", roomMapper.toDto(room));
 	}
 
 	@MessageMapping("/room/reduceTime")
-	@SendTo("/topic/room/all/reduceTime")
+	@SendTo("/topic/room/admin/reduceTime")
 	public RoomTrollDto reduceTimerByTroll(RoomTrollDto roomTrollDto) throws ProxiadControllerException {
 		Optional<Room> optRoom = roomRepository.findById(roomTrollDto.getId());
 		if (!optRoom.isPresent()) {
@@ -87,7 +87,7 @@ public class TimerWSController {
 		roomRepository.save(room);
 
 		RoomDto payload = roomMapper.toDto(room);
-		this.simpMessagingTemplate.convertAndSend("/topic/room/all/pause", payload);
+		this.simpMessagingTemplate.convertAndSend("/topic/room/admin/pause", payload);
 		this.simpMessagingTemplate.convertAndSend("/topic/room/" + roomDto.getId() + "/pause", payload);
 	}
 

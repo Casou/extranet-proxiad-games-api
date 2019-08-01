@@ -31,7 +31,7 @@ public class RoomWSController {
 	}
 
 	@MessageMapping("/room/fail")
-	@SendTo("/topic/room/all/fail")
+	@SendTo("/topic/room/admin/fail")
 	public RoomDto roomFailed(RoomDto roomDto) throws ProxiadControllerException {
 		Optional<Room> optRoom = roomRepository.findById(roomDto.getId());
 		if (!optRoom.isPresent()) {
