@@ -1,6 +1,5 @@
 package com.proxiad.games.extranet.dto;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +22,7 @@ public class RoomDto {
 	private String terminateStatus;
 
 	private TimerStatusEnum statusTime;
-	private LocalDateTime startTime;
+	private String startTime;
 	private Integer remainingTime;
 
 }

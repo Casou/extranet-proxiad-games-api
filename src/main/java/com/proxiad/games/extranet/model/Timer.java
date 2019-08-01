@@ -20,11 +20,12 @@ public class Timer {
 	@Enumerated(EnumType.STRING)
 	private TimerStatusEnum status;
 
-	private LocalDateTime startTime;
+	private LocalDateTime serverStartTime;
+	private String clientStartTime;
 	private Integer remainingTime;
 
 	public Integer calculatedRemainingTime() {
-		final long remainingTime = this.getRemainingTime() - this.getStartTime().until(LocalDateTime.now(), ChronoUnit.SECONDS);
+		final long remainingTime = this.getRemainingTime() - this.getServerStartTime().until(LocalDateTime.now(), ChronoUnit.SECONDS);
 		return Math.max(0, Math.toIntExact(remainingTime));
 	}
 

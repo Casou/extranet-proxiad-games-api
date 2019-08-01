@@ -1,7 +1,5 @@
 package com.proxiad.games.extranet.dto;
 
-import java.time.LocalDateTime;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,7 +17,7 @@ public class RoomTrollDto {
 	private String voice;
 	private String videoName;
 	private Integer reduceTime;
-	private LocalDateTime startTime;
+	private String clientStartTime;
 	private Integer remainingTime;
 
 }

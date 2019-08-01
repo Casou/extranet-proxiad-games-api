@@ -17,7 +17,7 @@ public class RoomMapper {
 		RoomDto dto = mapper.map(room, RoomDto.class);
 		dto.setToken(room.getConnectedToken() != null ? room.getConnectedToken().getToken() : null);
 		Optional.ofNullable(room.getTimer()).ifPresent(timer -> {
-			dto.setStartTime(timer.getStartTime());
+			dto.setStartTime(timer.getClientStartTime());
 			dto.setRemainingTime(Math.max(0, timer.getRemainingTime()));
 			dto.setStatusTime(timer.getStatus());
 		});

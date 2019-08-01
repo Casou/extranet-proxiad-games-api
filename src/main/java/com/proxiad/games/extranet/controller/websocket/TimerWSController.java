@@ -50,7 +50,8 @@ public class TimerWSController {
 		final Room room = getRoom(roomDto);
 
 		final Timer timer = Optional.ofNullable(room.getTimer()).orElseThrow(() -> new ProxiadControllerException("No timer found for the room " + room.getName()));
-		timer.setStartTime(LocalDateTime.now());
+		timer.setServerStartTime(LocalDateTime.now());
+		timer.setClientStartTime(roomDto.getStartTime());
 		timer.setStatus(TimerStatusEnum.STARTED);
 		room.setTimer(timer);
 		roomRepository.save(room);
@@ -67,7 +68,7 @@ public class TimerWSController {
 		}
 
 		Timer timer = optRoom.get().getTimer();
-		roomTrollDto.setStartTime(timer.getStartTime());
+		roomTrollDto.setClientStartTime(timer.getClientStartTime());
 		roomTrollDto.setRemainingTime(timer.getRemainingTime());
 
 		return roomTrollDto;
@@ -79,7 +80,8 @@ public class TimerWSController {
 
 		final Timer timer = Optional.ofNullable(room.getTimer()).orElseThrow(() -> new ProxiadControllerException("No timer found for the room " + room.getName()));
 
-		timer.setStartTime(LocalDateTime.now());
+		timer.setServerStartTime(LocalDateTime.now());
+		timer.setClientStartTime(roomDto.getStartTime());
 		timer.setStatus(TimerStatusEnum.PAUSED);
 		timer.setRemainingTime(timer.calculatedRemainingTime());
 

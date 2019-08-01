@@ -366,3 +366,9 @@ update room set timer = null [42122-197]
 org.h2.jdbc.JdbcSQLException: Table "TIMER" non trouvée
 Table "TIMER" not found; SQL statement:
 drop table timer [42102-197]
+2019-08-01 13:37:58 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLException: Erreur de syntaxe dans linstruction SQL {0}
+Syntax error in SQL statement {0}; SQL statement:
+delete from ROOM_TIMER t
+left outer join room r on t.id = r.timer_id
+where r.id is null [42000-197]
