@@ -1,7 +1,10 @@
 package com.proxiad.games.extranet.config;
 
-import com.proxiad.games.extranet.controller.ClientController;
-import lombok.extern.slf4j.Slf4j;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
@@ -9,14 +12,15 @@ import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.messaging.support.GenericMessage;
 import org.springframework.util.StringUtils;
-import org.springframework.web.socket.config.annotation.*;
+import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
+import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
+import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.messaging.SessionConnectEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import com.proxiad.games.extranet.controller.ClientController;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Configuration
 @EnableWebSocketMessageBroker
@@ -50,9 +54,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
 		MessageHeaders headers = message.getHeaders();
 		String sessionId = (String) headers.get("simpSessionId");
-		if (headers == null) {
-			log.info("Received a new web socket connection (no header) : " + event);
-		}
 
 		Optional<Map> nativeHeaders = Optional.ofNullable((Map) headers.get("nativeHeaders"));
 		if (!nativeHeaders.isPresent()) {
