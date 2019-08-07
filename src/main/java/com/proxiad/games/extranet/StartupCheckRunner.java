@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-import com.proxiad.games.extranet.enums.ParameterEnum;
+import com.proxiad.games.extranet.enums.MandatoryParameter;
 import com.proxiad.games.extranet.enums.TextEnum;
 import com.proxiad.games.extranet.model.Parameter;
 import com.proxiad.games.extranet.model.Text;
@@ -36,19 +36,26 @@ public class StartupCheckRunner implements CommandLineRunner {
 		log.info("******************************************");
 		log.info("********** Startup check runner **********\n\n\n");
 
-		List<String> unexistingParameters = parameterRepository.findAll().stream()
-				.map(Parameter::getKey)
-				.filter(parameterKey -> !ParameterEnum.findByKey(parameterKey).isPresent())
-				.collect(Collectors.toList());
-
-		if (!unexistingParameters.isEmpty()) {
-			log.error("There are missing parameters in database : " + String.join(", ", unexistingParameters));
-		}
-
+		checkMandatoryParameters();
 		manageTrollTexts();
 
 		log.info("******************************************");
 		log.info("******************************************");
+	}
+
+	private void checkMandatoryParameters() {
+		List<Parameter> parameters = parameterRepository.findAll();
+
+		List<MandatoryParameter> unexistingParameters = Arrays.stream(MandatoryParameter.values())
+				.filter(param -> parameters.stream().noneMatch(p -> p.getKey().equals(param.getKey())))
+				.collect(Collectors.toList());
+
+		if (!unexistingParameters.isEmpty()) {
+			log.error("There are missing parameters in database : " +
+					unexistingParameters.stream()
+							.map(MandatoryParameter::getKey)
+							.collect(Collectors.joining(", ")));
+		}
 	}
 
 	private void manageTrollTexts() {
