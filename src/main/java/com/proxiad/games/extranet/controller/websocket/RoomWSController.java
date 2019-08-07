@@ -33,12 +33,7 @@ public class RoomWSController {
 	@MessageMapping("/room/fail")
 	@SendTo("/topic/room/admin/fail")
 	public RoomDto roomFailed(RoomDto roomDto) throws ProxiadControllerException {
-		Optional<Room> optRoom = roomRepository.findById(roomDto.getId());
-		if (!optRoom.isPresent()) {
-			throw new ProxiadControllerException("Error in request (cannot retrieve room).");
-		}
-
-		Room room = optRoom.get();
+		Room room = getRoom(roomDto);
 		Timer timer = room.getTimer();
 		if (timer == null) {
 			throw new ProxiadControllerException("Error in request (timer not set).");
@@ -58,6 +53,25 @@ public class RoomWSController {
 	@MessageMapping("/room/refresh")
 	public void refreshFront(RoomDto roomDto) {
 		this.simpMessagingTemplate.convertAndSend("/topic/refresh/" + roomDto.getId(), roomDto);
+	}
+
+	@MessageMapping("/room/volume")
+	public void updateVolume(RoomDto roomDto) throws ProxiadControllerException {
+		Room room = getRoom(roomDto);
+		room.setAudioBackgroundVolume(roomDto.getAudioBackgroundVolume());
+		roomRepository.save(room);
+
+		this.simpMessagingTemplate.convertAndSend("/topic/room/" + room.getId() + "/volume", roomDto);
+	}
+
+
+	private Room getRoom(RoomDto roomDto) throws ProxiadControllerException {
+		Optional<Room> optRoom = roomRepository.findById(roomDto.getId());
+		if (!optRoom.isPresent()) {
+			throw new ProxiadControllerException("Error in request (cannot retrieve room).");
+		}
+
+		return optRoom.get();
 	}
 
 }

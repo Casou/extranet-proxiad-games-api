@@ -39,6 +39,9 @@ public class Room {
 	@NotNull
 	private Integer trollIndex = 0;
 
+	@NotNull
+	private Double audioBackgroundVolume = 0.0;
+
 	public boolean containsRiddle(String riddleId) {
 		return resolvedRiddles.stream().anyMatch(r -> r.getRiddleId().equals(riddleId));
 	}

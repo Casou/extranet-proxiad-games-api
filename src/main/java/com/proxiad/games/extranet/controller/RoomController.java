@@ -60,6 +60,17 @@ public class RoomController {
     public ResponseEntity<?> newRoom() {
         Room room = new Room();
         room.setName("Nouveau");
+
+        Optional<Parameter> defaultVolumeParameter = parameterRepository.findByKey(MandatoryParameter.AUDIO_BACKGROUND_DEFAULT_VOLUME.getKey());
+        Double defaultAudioVolume = Double.valueOf(
+                defaultVolumeParameter.orElse(Parameter.builder()
+                        .key(MandatoryParameter.AUDIO_BACKGROUND_DEFAULT_VOLUME.getKey())
+                        .value(MandatoryParameter.AUDIO_BACKGROUND_DEFAULT_VOLUME.getDefaultValue())
+                        .type(MandatoryParameter.AUDIO_BACKGROUND_DEFAULT_VOLUME.getType())
+                        .build())
+                        .getValue());
+        room.setAudioBackgroundVolume(defaultAudioVolume);
+
         roomRepository.save(room);
 
         return new ResponseEntity<>(room, HttpStatus.OK);

@@ -24,5 +24,6 @@ public class RoomDto {
 	private TimerStatusEnum statusTime;
 	private String startTime;
 	private Integer remainingTime;
+	private Double audioBackgroundVolume;
 
 }
