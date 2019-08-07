@@ -21,28 +21,10 @@ public class RiddleController {
 	@Autowired
 	private RiddleRepository riddleRepository;
 
-	@GetMapping("/riddles")
+	@GetMapping("/riddle")
 	@AdminTokenSecurity
 	public List<Riddle> getAllRiddles() {
 		return riddleRepository.findAll();
-	}
-
-	@PostMapping("/riddle")
-	@AdminTokenSecurity
-	public void saveRiddle(@RequestBody Riddle riddle) {
-		riddleRepository.save(riddle);
-	}
-
-	@DeleteMapping("/riddle")
-	@AdminTokenSecurity
-	public void deleteRiddle(@RequestBody Riddle riddle) {
-		Optional<Riddle> optRiddle = riddleRepository.findById(riddle.getId());
-
-		if (!optRiddle.isPresent()) {
-			throw new RuntimeException("Riddle " + riddle.getId() + " not found");
-		}
-
-		riddleRepository.delete(optRiddle.get());
 	}
 
 	@PutMapping(value = "/riddle")
@@ -57,7 +39,7 @@ public class RiddleController {
 		return new ResponseEntity<>(riddle, HttpStatus.OK);
 	}
 
-	@PostMapping(value = "/riddle/{id}/name")
+	@PatchMapping(value = "/riddle/{id}/name")
 	@AdminTokenSecurity
 	public ResponseEntity<?> updateRiddleName(@PathVariable("id") Integer id, @RequestBody RiddleDto riddleDto) {
 		Riddle riddle;
@@ -72,7 +54,7 @@ public class RiddleController {
 		return new ResponseEntity<>(riddle, HttpStatus.OK);
 	}
 
-	@PostMapping(value = "/riddle/{id}/riddleId")
+	@PatchMapping(value = "/riddle/{id}/riddleId")
 	@AdminTokenSecurity
 	public ResponseEntity<?> updateRiddleId(@PathVariable("id") Integer id, @RequestBody RiddleDto riddleDto) {
 		Riddle riddle;

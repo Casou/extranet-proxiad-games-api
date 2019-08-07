@@ -1,7 +1,9 @@
 package com.proxiad.games.extranet.controller;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -9,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
+import com.proxiad.games.extranet.dto.RiddleDto;
+import com.proxiad.games.extranet.dto.RoomStatusDto;
 import com.proxiad.games.extranet.dto.UnlockDto;
 import com.proxiad.games.extranet.enums.TextEnum;
 import com.proxiad.games.extranet.enums.TimerStatusEnum;
@@ -35,6 +39,19 @@ public class UnlockController {
 
 	@Autowired
 	private RiddleRepository riddleRepository;
+
+	@GetMapping("/unlock/status")
+	public RoomStatusDto getRoomStatus(@RequestAttribute Optional<Room> room) {
+		List<RiddleDto> riddleDtos = riddleRepository.findAll().stream()
+				.map(RiddleDto::new)
+				.peek(riddleDto -> riddleDto.setIsResolved(room.orElse(new Room()).containsRiddle(riddleDto.getRiddleId())))
+				.sorted(Comparator.comparing(RiddleDto::getRiddleId))
+				.collect(Collectors.toList());
+
+		return RoomStatusDto.builder()
+				.riddles(riddleDtos)
+				.build();
+	}
 
 	@PostMapping("/unlock")
 	public ResponseEntity<?> unlockRiddle(@RequestBody UnlockDto unlockDto, @RequestAttribute String token) {

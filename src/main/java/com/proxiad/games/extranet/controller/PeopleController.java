@@ -28,7 +28,7 @@ public class PeopleController {
 
 	private static ModelMapper mapper = new ModelMapper();
 
-	@GetMapping("/people/all")
+	@GetMapping("/people")
 	public List<PeopleNameDto> getAll() {
 		return StreamSupport.stream(
 				peopleRepository.findAllByOrderBySurnameAscNameAsc().spliterator(), false)
