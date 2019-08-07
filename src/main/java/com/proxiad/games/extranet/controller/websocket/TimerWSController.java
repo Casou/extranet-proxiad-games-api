@@ -68,7 +68,7 @@ public class TimerWSController {
 		}
 
 		Timer timer = optRoom.get().getTimer();
-		roomTrollDto.setClientStartTime(timer.getClientStartTime());
+		roomTrollDto.setStartTime(timer.getClientStartTime());
 		roomTrollDto.setRemainingTime(timer.getRemainingTime());
 
 		return roomTrollDto;

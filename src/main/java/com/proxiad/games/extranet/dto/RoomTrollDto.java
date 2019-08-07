@@ -17,7 +17,7 @@ public class RoomTrollDto {
 	private String voice;
 	private String videoName;
 	private Integer reduceTime;
-	private String clientStartTime;
+	private String startTime;
 	private Integer remainingTime;
 
 }

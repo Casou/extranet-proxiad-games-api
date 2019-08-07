@@ -14,12 +14,15 @@ import com.proxiad.games.extranet.annotation.AdminTokenSecurity;
 import com.proxiad.games.extranet.annotation.BypassSecurity;
 import com.proxiad.games.extranet.dto.RoomDto;
 import com.proxiad.games.extranet.dto.RoomTrollDto;
+import com.proxiad.games.extranet.enums.MandatoryParameter;
 import com.proxiad.games.extranet.enums.TextEnum;
 import com.proxiad.games.extranet.exception.ProxiadControllerException;
 import com.proxiad.games.extranet.mapper.RoomMapper;
+import com.proxiad.games.extranet.model.Parameter;
 import com.proxiad.games.extranet.model.Room;
 import com.proxiad.games.extranet.model.Text;
 import com.proxiad.games.extranet.model.Timer;
+import com.proxiad.games.extranet.repository.ParameterRepository;
 import com.proxiad.games.extranet.repository.RoomRepository;
 import com.proxiad.games.extranet.repository.TextRepository;
 import com.proxiad.games.extranet.service.RoomService;
@@ -28,120 +31,133 @@ import com.proxiad.games.extranet.service.RoomService;
 @CrossOrigin
 public class RoomController {
 
-	@Autowired
-	private RoomService roomService;
+    @Autowired
+    private RoomService roomService;
 
-	@Autowired
-	private RoomRepository roomRepository;
+    @Autowired
+    private RoomRepository roomRepository;
 
-	@Autowired
-	private TextRepository textRepository;
+    @Autowired
+    private TextRepository textRepository;
 
-	@Autowired
-	private RoomMapper roomMapper;
+    @Autowired
+    private RoomMapper roomMapper;
 
-	@Autowired
-	private SimpMessagingTemplate simpMessagingTemplate;
+    @Autowired
+    private ParameterRepository parameterRepository;
 
-	@GetMapping("/room")
-	@AdminTokenSecurity
-	public List<RoomDto> listAllRooms() {
-		return roomService.findAll();
-	}
+    @Autowired
+    private SimpMessagingTemplate simpMessagingTemplate;
 
-	@PutMapping(value = "/room")
-	@AdminTokenSecurity
-	public ResponseEntity<?> newRoom() {
-		Room room = new Room();
-		room.setName("Nouveau");
-		roomRepository.save(room);
+    @GetMapping("/room")
+    @AdminTokenSecurity
+    public List<RoomDto> listAllRooms() {
+        return roomService.findAll();
+    }
 
-		return new ResponseEntity<>(room, HttpStatus.OK);
-	}
+    @PutMapping(value = "/room")
+    @AdminTokenSecurity
+    public ResponseEntity<?> newRoom() {
+        Room room = new Room();
+        room.setName("Nouveau");
+        roomRepository.save(room);
 
-	@PostMapping(value = "/room/{id}/name")
-	@AdminTokenSecurity
-	public ResponseEntity<?> updateRoomName(@PathVariable("id") Integer id, @RequestBody RoomDto updatedRoom) {
-		Optional<Room> optRoom = roomRepository.findById(id);
+        return new ResponseEntity<>(room, HttpStatus.OK);
+    }
 
-		if (!optRoom.isPresent()) {
-			return new ResponseEntity<>("No room with id " + id, HttpStatus.BAD_REQUEST);
-		}
+    @PostMapping(value = "/room/{id}/name")
+    @AdminTokenSecurity
+    public ResponseEntity<?> updateRoomName(@PathVariable("id") Integer id, @RequestBody RoomDto updatedRoom) {
+        Optional<Room> optRoom = roomRepository.findById(id);
 
-		Room room = optRoom.get();
-		room.setName(updatedRoom.getName());
-		roomRepository.save(room);
+        if (!optRoom.isPresent()) {
+            return new ResponseEntity<>("No room with id " + id, HttpStatus.BAD_REQUEST);
+        }
 
-		return new ResponseEntity<>(room, HttpStatus.OK);
-	}
+        Room room = optRoom.get();
+        room.setName(updatedRoom.getName());
+        roomRepository.save(room);
 
-	@DeleteMapping(value = "/room/{id}")
-	@AdminTokenSecurity
-	public ResponseEntity<?> deleteRoom(@PathVariable("id") Integer id) {
-		Optional<Room> optRoom = roomRepository.findById(id);
+        return new ResponseEntity<>(room, HttpStatus.OK);
+    }
 
-		if (!optRoom.isPresent()) {
-			return new ResponseEntity<>("No room with id " + id, HttpStatus.BAD_REQUEST);
-		}
+    @DeleteMapping(value = "/room/{id}")
+    @AdminTokenSecurity
+    public ResponseEntity<?> deleteRoom(@PathVariable("id") Integer id) {
+        Optional<Room> optRoom = roomRepository.findById(id);
 
-		roomRepository.delete(optRoom.get());
+        if (!optRoom.isPresent()) {
+            return new ResponseEntity<>("No room with id " + id, HttpStatus.BAD_REQUEST);
+        }
 
-		return new ResponseEntity<>("deleted", HttpStatus.OK);
-	}
+        roomRepository.delete(optRoom.get());
 
-	@PatchMapping(value = "/room/{id}/reinit")
-	@AdminTokenSecurity
-	public ResponseEntity<?> reinitRoom(@PathVariable("id") Integer id) {
-		Optional<Room> optRoom = roomRepository.findById(id);
-		if (!optRoom.isPresent()) {
-			return new ResponseEntity<>("No room with id " + id, HttpStatus.BAD_REQUEST);
-		}
+        return new ResponseEntity<>("deleted", HttpStatus.OK);
+    }
 
-		Room room = optRoom.get();
-		room.setResolvedRiddles(new ArrayList<>());
-		room.setTimer(null);
-		room.setIsTerminated(false);
-		room.setTerminateStatus(null);
-		room.setTrollIndex(0);
-		roomRepository.save(room);
+    @PatchMapping(value = "/room/{id}/reinit")
+    @AdminTokenSecurity
+    public ResponseEntity<?> reinitRoom(@PathVariable("id") Integer id) {
+        Optional<Room> optRoom = roomRepository.findById(id);
+        if (!optRoom.isPresent()) {
+            return new ResponseEntity<>("No room with id " + id, HttpStatus.BAD_REQUEST);
+        }
 
-		this.simpMessagingTemplate.convertAndSend("/topic/room/" + room.getId() + "/reinit", new RoomDto());
+        Room room = optRoom.get();
+        room.setResolvedRiddles(new ArrayList<>());
+        room.setTimer(null);
+        room.setIsTerminated(false);
+        room.setTerminateStatus(null);
+        room.setTrollIndex(0);
+        roomRepository.save(room);
 
-		return new ResponseEntity<>(roomMapper.toDto(room), HttpStatus.OK);
-	}
+        this.simpMessagingTemplate.convertAndSend("/topic/room/" + room.getId() + "/reinit", new RoomDto());
 
-	@RequestMapping("/user/troll")
-	@BypassSecurity
-	public void troll(@RequestParam("salle") String roomName) throws ProxiadControllerException {
-		final Optional<Room> optRoom = roomRepository.findByNameIgnoreCase(roomName);
-		if (!optRoom.isPresent()) {
-			throw new ProxiadControllerException("Your room is unknown. Please contact the administrator.");
-		}
+        return new ResponseEntity<>(roomMapper.toDto(room), HttpStatus.OK);
+    }
 
-		final Room room = optRoom.get();
+    @RequestMapping("/user/troll")
+    @BypassSecurity
+    public void troll(@RequestParam("salle") String roomName) throws ProxiadControllerException {
+        final Optional<Room> optRoom = roomRepository.findByNameIgnoreCase(roomName);
+        if (!optRoom.isPresent()) {
+            throw new ProxiadControllerException("Your room is unknown. Please contact the administrator.");
+        }
 
-		final List<Text> trollTexts = textRepository.findAllByDiscriminantOrderByIdAsc(TextEnum.TROLL);
+        final Room room = optRoom.get();
 
-		final Timer timer = Optional.ofNullable(room.getTimer()).orElseThrow(() -> new ProxiadControllerException("No timer found for the room " + room.getName()));
-		timer.setRemainingTime(Math.max(0, timer.getRemainingTime() - 120));
-		room.setTimer(timer);
-		final Integer trollIndex = room.getTrollIndex();
-		final Integer newTrollIndex = trollIndex + 1 >= trollTexts.size() ? trollTexts.size() - 1 : trollIndex + 1;
-		room.setTrollIndex(newTrollIndex);
-		roomRepository.save(room);
+        Optional<Parameter> decreaseTimeParameter = parameterRepository.findByKey(MandatoryParameter.TROLL_DECREASE_TIME.getKey());
+        Integer decreaseTime = Integer.parseInt(decreaseTimeParameter.orElse(
+                Parameter.builder()
+                        .key(MandatoryParameter.TROLL_DECREASE_TIME.getKey())
+                        .value(MandatoryParameter.TROLL_DECREASE_TIME.getDefaultValue())
+                        .type(MandatoryParameter.TROLL_DECREASE_TIME.getType()
+                        )
+                        .build())
+                .getValue());
 
-		final Text trollText = trollTexts.get(trollIndex);
-		final RoomTrollDto roomTrollDto = RoomTrollDto.builder()
-				.id(room.getId())
-				.name(room.getName())
-				.reduceTime(120)
-				.message(trollText.getText())
-				.voice(trollText.getVoice())
-				.videoName(trollText.getVideoName())
-				.build();
+        final List<Text> trollTexts = textRepository.findAllByDiscriminantOrderByIdAsc(TextEnum.TROLL);
 
-		this.simpMessagingTemplate.convertAndSend("/topic/room/admin/troll", roomTrollDto);
-		this.simpMessagingTemplate.convertAndSend("/topic/room/" + room.getId() + "/troll", roomTrollDto);
-	}
+        final Timer timer = Optional.ofNullable(room.getTimer()).orElseThrow(() -> new ProxiadControllerException("No timer found for the room " + room.getName()));
+        timer.setRemainingTime(Math.max(0, timer.getRemainingTime() - decreaseTime));
+        room.setTimer(timer);
+        final Integer trollIndex = room.getTrollIndex();
+        final Integer newTrollIndex = trollIndex + 1 >= trollTexts.size() ? trollTexts.size() - 1 : trollIndex + 1;
+        room.setTrollIndex(newTrollIndex);
+        roomRepository.save(room);
+
+        final Text trollText = trollTexts.get(trollIndex);
+        final RoomTrollDto roomTrollDto = RoomTrollDto.builder()
+                .id(room.getId())
+                .name(room.getName())
+                .reduceTime(decreaseTime)
+                .message(trollText.getText())
+                .voice(trollText.getVoice())
+                .videoName(trollText.getVideoName())
+                .build();
+
+        this.simpMessagingTemplate.convertAndSend("/topic/room/admin/troll", roomTrollDto);
+        this.simpMessagingTemplate.convertAndSend("/topic/room/" + room.getId() + "/troll", roomTrollDto);
+    }
 
 }
