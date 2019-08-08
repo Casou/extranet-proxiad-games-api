@@ -20,4 +20,8 @@ public class Voice {
 	private Double rate = 1.0;
 	private Double volume = 1.0;
 
+	public Voice(String name) {
+		this.name = name;
+	}
+
 }
