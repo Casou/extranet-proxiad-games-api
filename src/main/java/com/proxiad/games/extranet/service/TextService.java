@@ -20,7 +20,7 @@ public class TextService {
 		Optional<Text> optIntro = introSentenceRepository.findById(introSentence.getId());
 		Text introSentenceToUpdate = optIntro.orElseThrow(() -> new ProxiadControllerException("Intro sentence not found for id " + introSentence.getId()));
 		introSentenceToUpdate.setText(introSentence.getText());
-		introSentenceToUpdate.setVoice(introSentence.getVoiceName());
+		introSentenceToUpdate.setVoiceName(introSentence.getVoiceName());
 		introSentenceRepository.save(introSentenceToUpdate);
 	}
 

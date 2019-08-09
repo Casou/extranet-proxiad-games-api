@@ -26,7 +26,7 @@ public class Text {
 	private String text = "";
 
 	@NotNull
-	private String voice = "French Female";
+	private String voiceName = "French Female";
 
 	@Enumerated(EnumType.STRING)
 	@NotNull
