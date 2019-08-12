@@ -415,3 +415,7 @@ INSERT INTO PARAMETER (id, description, key, type, value) values (30, 'Flag qui 
 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
 	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)
 	at java.lang.Thread.run(Thread.java:748)
+2019-08-09 14:28:24 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLException: Erreur de syntaxe dans linstruction SQL {0}
+Syntax error in SQL statement {0}; SQL statement:
+INSERT INTO PARAMETER (id, description, key, value, type) values ('30', 'Durée d'animation de la barre de chargement', 'PROGRESS_BAR_DURATION', '300', 'NUMBER') [42000-197]
