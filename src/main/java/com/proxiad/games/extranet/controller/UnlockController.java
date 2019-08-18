@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.proxiad.games.extranet.model.*;
+import com.proxiad.games.extranet.repository.VoiceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,10 +18,6 @@ import com.proxiad.games.extranet.dto.RoomStatusDto;
 import com.proxiad.games.extranet.dto.UnlockDto;
 import com.proxiad.games.extranet.enums.TextEnum;
 import com.proxiad.games.extranet.enums.TimerStatusEnum;
-import com.proxiad.games.extranet.model.Riddle;
-import com.proxiad.games.extranet.model.Room;
-import com.proxiad.games.extranet.model.Text;
-import com.proxiad.games.extranet.model.Timer;
 import com.proxiad.games.extranet.repository.RiddleRepository;
 import com.proxiad.games.extranet.repository.RoomRepository;
 import com.proxiad.games.extranet.repository.TextRepository;
@@ -39,6 +37,9 @@ public class UnlockController {
 
 	@Autowired
 	private RiddleRepository riddleRepository;
+
+	@Autowired
+	private VoiceRepository voiceRepository;
 
 	@GetMapping("/unlock/status")
 	public RoomStatusDto getRoomStatus(@RequestAttribute Optional<Room> room) {
@@ -90,11 +91,13 @@ public class UnlockController {
 		room.getResolvedRiddles().add(riddle);
 		roomRepository.save(room);
 
+		Voice voice = voiceRepository.findByName(textToSend.getVoiceName()).orElse(new Voice());
+
 		unlockDto.setId(riddle.getId());
 		unlockDto.setRoomId(room.getId());
 		unlockDto.setNbRiddlesResolved(resolvedRiddles.size());
 		unlockDto.setMessage(textToSend.getText());
-		unlockDto.setVoice(textToSend.getVoiceName());
+		unlockDto.setVoice(voice);
 		this.simpMessagingTemplate.convertAndSend("/topic/riddle/unlock", unlockDto);
 		this.simpMessagingTemplate.convertAndSend("/topic/room/" + room.getId() + "/unlockRiddle", unlockDto);
 

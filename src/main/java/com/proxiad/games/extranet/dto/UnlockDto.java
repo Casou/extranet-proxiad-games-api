@@ -1,5 +1,6 @@
 package com.proxiad.games.extranet.dto;
 
+import com.proxiad.games.extranet.model.Voice;
 import lombok.Data;
 
 @Data
@@ -12,7 +13,7 @@ public class UnlockDto {
 	private Integer roomId;
 
 	private String message;
-	private String voice;
+	private Voice voice;
 	private Integer nbRiddlesResolved;
 
 }

@@ -3,16 +3,16 @@ package com.proxiad.games.extranet.controller;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.proxiad.games.extranet.dto.*;
+import com.proxiad.games.extranet.model.Voice;
+import com.proxiad.games.extranet.repository.VoiceRepository;
+import com.proxiad.games.extranet.service.TextService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.proxiad.games.extranet.annotation.AdminTokenSecurity;
-import com.proxiad.games.extranet.dto.RoomSessionDto;
-import com.proxiad.games.extranet.dto.TerminalCommandDto;
-import com.proxiad.games.extranet.dto.TokenDto;
-import com.proxiad.games.extranet.dto.UserSessionDto;
 import com.proxiad.games.extranet.enums.TextEnum;
 import com.proxiad.games.extranet.model.Room;
 import com.proxiad.games.extranet.model.Text;
@@ -31,6 +31,9 @@ public class ClientController {
 
 	@Autowired
 	private TextRepository textRepository;
+
+	@Autowired
+	private TextService textService;
 
 	@Autowired
 	private SimpMessagingTemplate simpMessagingTemplate;
@@ -74,11 +77,12 @@ public class ClientController {
 	public void userConnected(String token, String sessionId) {
 		if (CONNECTED_USERS_TOKEN.containsKey(token)) {
 			Text text = textRepository.findAllByDiscriminantOrderByIdAsc(TextEnum.OPEN_TERMINAL).get(0);
+			TextDto textDto = textService.mapToDto(text);
 
 			UserSessionDto userSessionDto = CONNECTED_USERS_TOKEN.get(token);
 			userSessionDto.setSessionId(sessionId);
 			userSessionDto.setIsConnected(true);
-			userSessionDto.setMessage(text);
+			userSessionDto.setMessage(textDto);
 			this.simpMessagingTemplate.convertAndSend("/topic/user/connected", userSessionDto);
 			this.simpMessagingTemplate.convertAndSend("/topic/user/" + userSessionDto.getRoomId() + "/connected", userSessionDto);
 			return;
@@ -89,13 +93,14 @@ public class ClientController {
 
 		optToken.ifPresent(tokenDto -> {
 			Text text = textRepository.findAllByDiscriminantOrderByIdAsc(TextEnum.OPEN_TERMINAL).get(0);
+			TextDto textDto = textService.mapToDto(text);
 
 			UserSessionDto userSessionDto = UserSessionDto.builder()
 					.token(token)
 					.sessionId(sessionId)
 					.roomId(optRoom.orElse(new Room()).getId())
 					.isConnected(true)
-					.message(text)
+					.message(textDto)
 					.build();
 
 			CONNECTED_USERS_TOKEN.put(token, userSessionDto);

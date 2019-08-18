@@ -19,6 +19,6 @@ public class UserSessionDto {
 	@Builder.Default
 	private List<TerminalCommandDto> commands = new LinkedList<>();
 
-	private Text message;
+	private TextDto message;
 
 }
