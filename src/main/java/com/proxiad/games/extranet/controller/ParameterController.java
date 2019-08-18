@@ -34,12 +34,14 @@ public class ParameterController {
 
 	@PatchMapping("/parametre")
 	@AdminTokenSecurity
-	public void updateParametre(@RequestBody Parameter changedParameter) throws ProxiadControllerException {
+	public Parameter updateParametre(@RequestBody Parameter changedParameter) throws ProxiadControllerException {
 		Optional<Parameter> optParameter = parameterRepository.findById(changedParameter.getId());
 		Parameter parameter = optParameter.orElseThrow(() -> new ProxiadControllerException("Parameter " + changedParameter.getId() + " not found"));
 
 		parameter.setValue(changedParameter.getValue());
 		parameterRepository.save(parameter);
+
+		return parameter;
 	}
 
 }

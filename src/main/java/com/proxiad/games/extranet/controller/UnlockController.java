@@ -94,7 +94,7 @@ public class UnlockController {
 		unlockDto.setRoomId(room.getId());
 		unlockDto.setNbRiddlesResolved(resolvedRiddles.size());
 		unlockDto.setMessage(textToSend.getText());
-		unlockDto.setVoice(textToSend.getVoice());
+		unlockDto.setVoice(textToSend.getVoiceName());
 		this.simpMessagingTemplate.convertAndSend("/topic/riddle/unlock", unlockDto);
 		this.simpMessagingTemplate.convertAndSend("/topic/room/" + room.getId() + "/unlockRiddle", unlockDto);
 
