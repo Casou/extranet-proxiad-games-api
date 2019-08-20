@@ -1,22 +1,21 @@
 package com.proxiad.games.extranet;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.stereotype.Component;
-
 import com.proxiad.games.extranet.enums.MandatoryParameter;
 import com.proxiad.games.extranet.enums.TextEnum;
 import com.proxiad.games.extranet.model.Parameter;
 import com.proxiad.games.extranet.model.Text;
 import com.proxiad.games.extranet.repository.ParameterRepository;
 import com.proxiad.games.extranet.repository.TextRepository;
-
+import com.proxiad.games.extranet.utils.NetworkUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -27,6 +26,9 @@ public class StartupCheckRunner implements CommandLineRunner {
 
 	@Autowired
 	private TextRepository textRepository;
+
+	@Value("${server.port}")
+	private String serverPort;
 
 	@Value("${application.allVideos}")
 	private String allVideos;
@@ -41,6 +43,8 @@ public class StartupCheckRunner implements CommandLineRunner {
 
 		log.info("******************************************");
 		log.info("******************************************");
+
+		log.info("Server started : " + NetworkUtils.getIpString(serverPort));
 	}
 
 	private void checkMandatoryParameters() {
