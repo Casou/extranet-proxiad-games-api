@@ -9,7 +9,6 @@ if [[ "$version" < "1.8" ]]; then
 	exit 1;
 fi
 
-cd /var/www/impro-photo
 lastJar="$(ls -tr target | grep '\.jar$' | tail -1)"
 
 echo
