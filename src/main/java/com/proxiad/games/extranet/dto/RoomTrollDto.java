@@ -1,5 +1,7 @@
 package com.proxiad.games.extranet.dto;
 
+import com.proxiad.games.extranet.model.Voice;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,7 +16,7 @@ public class RoomTrollDto {
 	private Integer id;
 	private String name;
 	private String message;
-	private String voice;
+	private Voice voice;
 	private String videoName;
 	private Integer reduceTime;
 	private String startTime;

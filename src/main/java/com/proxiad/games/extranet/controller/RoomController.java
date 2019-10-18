@@ -18,13 +18,11 @@ import com.proxiad.games.extranet.enums.MandatoryParameter;
 import com.proxiad.games.extranet.enums.TextEnum;
 import com.proxiad.games.extranet.exception.ProxiadControllerException;
 import com.proxiad.games.extranet.mapper.RoomMapper;
-import com.proxiad.games.extranet.model.Parameter;
-import com.proxiad.games.extranet.model.Room;
-import com.proxiad.games.extranet.model.Text;
-import com.proxiad.games.extranet.model.Timer;
+import com.proxiad.games.extranet.model.*;
 import com.proxiad.games.extranet.repository.ParameterRepository;
 import com.proxiad.games.extranet.repository.RoomRepository;
 import com.proxiad.games.extranet.repository.TextRepository;
+import com.proxiad.games.extranet.repository.VoiceRepository;
 import com.proxiad.games.extranet.service.RoomService;
 
 @RestController
@@ -48,6 +46,9 @@ public class RoomController {
 
     @Autowired
     private SimpMessagingTemplate simpMessagingTemplate;
+
+    @Autowired
+    private VoiceRepository voiceRepository;
 
     @GetMapping("/room")
     @AdminTokenSecurity
@@ -89,7 +90,7 @@ public class RoomController {
         room.setName(updatedRoom.getName());
         roomRepository.save(room);
 
-        return new ResponseEntity<>(room, HttpStatus.OK);
+        return new ResponseEntity<>(updatedRoom.getName(), HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/room/{id}")
@@ -158,12 +159,13 @@ public class RoomController {
         roomRepository.save(room);
 
         final Text trollText = trollTexts.get(trollIndex);
+        final Voice voice = voiceRepository.findByName(trollText.getVoiceName()).orElse(new Voice());
         final RoomTrollDto roomTrollDto = RoomTrollDto.builder()
                 .id(room.getId())
                 .name(room.getName())
                 .reduceTime(decreaseTime)
                 .message(trollText.getText())
-                .voice(trollText.getVoiceName())
+                .voice(voice)
                 .videoName(trollText.getVideoName())
                 .build();
 
