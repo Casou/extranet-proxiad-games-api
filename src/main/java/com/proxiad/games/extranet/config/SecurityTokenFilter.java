@@ -1,18 +1,12 @@
 package com.proxiad.games.extranet.config;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
+import com.proxiad.games.extranet.annotation.AdminTokenSecurity;
+import com.proxiad.games.extranet.annotation.BypassSecurity;
+import com.proxiad.games.extranet.dto.TokenDto;
+import com.proxiad.games.extranet.repository.RoomRepository;
+import com.proxiad.games.extranet.service.AuthService;
+import com.proxiad.games.extranet.utils.URIPatternMatchers;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,14 +20,18 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
-import com.proxiad.games.extranet.annotation.AdminTokenSecurity;
-import com.proxiad.games.extranet.annotation.BypassSecurity;
-import com.proxiad.games.extranet.dto.TokenDto;
-import com.proxiad.games.extranet.repository.RoomRepository;
-import com.proxiad.games.extranet.service.AuthService;
-import com.proxiad.games.extranet.utils.URIPatternMatchers;
-
-import lombok.extern.slf4j.Slf4j;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Configuration
 @Slf4j
@@ -179,13 +177,11 @@ public class SecurityTokenFilter extends GenericFilterBean {
                 + " \n ContentType :: " + requestWrapper.getContentType());
     }
 
-    private void logResponse(CustomLogResponseWrapper responseWrapper, CustomLogRequestWrapper requestWrapper)
-            throws IOException {
+    private void logResponse(CustomLogResponseWrapper responseWrapper, CustomLogRequestWrapper requestWrapper) {
         logResponse(responseWrapper, requestWrapper, "");
     }
 
-    private void logResponse(CustomLogResponseWrapper responseWrapper, CustomLogRequestWrapper requestWrapper, String customText)
-            throws IOException {
+    private void logResponse(CustomLogResponseWrapper responseWrapper, CustomLogRequestWrapper requestWrapper, String customText) {
         if (requestLogLevel == CustomLogLevel.NONE) {
             return;
         }
