@@ -5,8 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import com.proxiad.games.extranet.model.*;
-import com.proxiad.games.extranet.repository.VoiceRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,9 +17,11 @@ import com.proxiad.games.extranet.dto.RoomStatusDto;
 import com.proxiad.games.extranet.dto.UnlockDto;
 import com.proxiad.games.extranet.enums.TextEnum;
 import com.proxiad.games.extranet.enums.TimerStatusEnum;
+import com.proxiad.games.extranet.model.*;
 import com.proxiad.games.extranet.repository.RiddleRepository;
 import com.proxiad.games.extranet.repository.RoomRepository;
 import com.proxiad.games.extranet.repository.TextRepository;
+import com.proxiad.games.extranet.repository.VoiceRepository;
 
 @RestController
 @CrossOrigin
@@ -41,10 +42,12 @@ public class UnlockController {
 	@Autowired
 	private VoiceRepository voiceRepository;
 
+	private static final ModelMapper modelMapper = new ModelMapper();
+
 	@GetMapping("/unlock/status")
 	public RoomStatusDto getRoomStatus(@RequestAttribute Optional<Room> room) {
 		List<RiddleDto> riddleDtos = riddleRepository.findAll().stream()
-				.map(RiddleDto::new)
+				.map(riddle -> modelMapper.map(modelMapper, RiddleDto.class))
 				.peek(riddleDto -> riddleDto.setIsResolved(room.orElse(new Room()).containsRiddle(riddleDto.getRiddleId())))
 				.sorted(Comparator.comparing(RiddleDto::getRiddleId))
 				.collect(Collectors.toList());
@@ -68,7 +71,8 @@ public class UnlockController {
 			return new ResponseEntity<>("Timer is stopped.", HttpStatus.FORBIDDEN);
 		}
 
-		List<Riddle> resolvedRiddles = room.getResolvedRiddles();
+		// TODO A Refacto
+		List<Riddle> resolvedRiddles = room.getRiddles();
 		if (resolvedRiddles.stream().anyMatch(riddle -> riddle.getRiddleId().equals(unlockDto.getRiddleId()))) {
 			return new ResponseEntity<>("Riddle already unlocked.", HttpStatus.FORBIDDEN);
 		}
@@ -88,7 +92,7 @@ public class UnlockController {
 		}
 
 		Riddle riddle = optResolvedRiddle.get();
-		room.getResolvedRiddles().add(riddle);
+		room.getRiddles().add(riddle);
 		roomRepository.save(room);
 
 		Voice voice = voiceRepository.findByName(textToSend.getVoiceName()).orElse(new Voice());

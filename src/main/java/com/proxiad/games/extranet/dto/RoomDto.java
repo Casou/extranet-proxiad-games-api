@@ -17,7 +17,7 @@ public class RoomDto {
 	private Integer id;
 	private String name;
 	private String token;
-	private List<RiddleDto> resolvedRiddles = new ArrayList<>();
+	private List<RiddleDto> riddles = new ArrayList<>();
 	private Boolean isTerminated;
 	private String terminateStatus;
 

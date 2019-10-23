@@ -1,6 +1,6 @@
 package com.proxiad.games.extranet.dto;
 
-import com.proxiad.games.extranet.model.Riddle;
+import com.proxiad.games.extranet.enums.RiddleType;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,13 +14,7 @@ public class RiddleDto {
 	private String riddleId;
 	private String riddlePassword;
 	private Boolean isResolved;
-
-	public RiddleDto(Riddle riddle) {
-		this.id = riddle.getId();
-		this.name = riddle.getName();
-		this.riddleId = riddle.getRiddleId();
-		this.riddlePassword = riddle.getRiddlePassword();
-		this.isResolved = false;
-	}
+	private Integer roomId;
+	private RiddleType type;
 
 }

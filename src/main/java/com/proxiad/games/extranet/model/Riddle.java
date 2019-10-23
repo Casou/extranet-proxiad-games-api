@@ -2,14 +2,17 @@ package com.proxiad.games.extranet.model;
 
 import javax.persistence.*;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.proxiad.games.extranet.enums.RiddleType;
+
+import lombok.*;
 
 @Data
 @Entity
 @Table(name="riddle")
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Riddle {
 
 	@Id
@@ -22,7 +25,17 @@ public class Riddle {
 	@NonNull
 	private String riddleId;
 
+	private String riddlePassword = null;
+
 	@NonNull
-	private String riddlePassword;
+	private Boolean resolved = false;
+
+	@NonNull
+	private RiddleType type;
+
+	@ManyToOne
+	@JoinColumn(name="room_id", nullable=false)
+	@JsonIgnore
+	private Room room;
 
 }
