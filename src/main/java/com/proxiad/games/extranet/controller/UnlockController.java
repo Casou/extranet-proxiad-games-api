@@ -46,6 +46,7 @@ public class UnlockController {
 
 	@GetMapping("/unlock/status")
 	public RoomStatusDto getRoomStatus(@RequestAttribute Optional<Room> room) {
+		// TODO Refacto salle !!!
 		List<RiddleDto> riddleDtos = riddleRepository.findAll().stream()
 				.map(riddle -> modelMapper.map(modelMapper, RiddleDto.class))
 				.peek(riddleDto -> riddleDto.setIsResolved(room.orElse(new Room()).containsRiddle(riddleDto.getRiddleId())))
@@ -77,6 +78,7 @@ public class UnlockController {
 			return new ResponseEntity<>("Riddle already unlocked.", HttpStatus.FORBIDDEN);
 		}
 
+		// TODO Refacto salle !!!
 		final List<Riddle> allRiddles = riddleRepository.findAll();
 		final Optional<Riddle> optResolvedRiddle = allRiddles.stream().filter(riddle -> riddle.getRiddleId().equals(unlockDto.getRiddleId())
 				&& riddle.getRiddlePassword().equals(unlockDto.getPassword())).findFirst();

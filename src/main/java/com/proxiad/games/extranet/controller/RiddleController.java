@@ -27,6 +27,7 @@ public class RiddleController {
 	@GetMapping("/riddle")
 	@AdminTokenSecurity
 	public List<Riddle> getAllRiddles() {
+		// TODO Refacto salle !!!
 		return riddleRepository.findAll();
 	}
 

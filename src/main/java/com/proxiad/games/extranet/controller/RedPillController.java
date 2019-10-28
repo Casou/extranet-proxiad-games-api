@@ -49,6 +49,7 @@ public class RedPillController {
 			return new ResponseEntity<>("Error in request (timer not set).", HttpStatus.BAD_REQUEST);
 		}
 
+		// TODO Refacto salle !!!
 		List<Riddle> allRiddles = riddleRepository.findAll();
 
 		if (allRiddles.stream().anyMatch(riddle -> !room.containsRiddle(riddle.getRiddleId()))) {

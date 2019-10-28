@@ -29,6 +29,10 @@ public class Room {
 	@JoinColumn(name = "room_id")
 	private List<Riddle> riddles = new ArrayList<>();
 
+	@OneToMany(orphanRemoval=true, cascade = CascadeType.REMOVE)
+	@JoinColumn(name = "room_id")
+	private List<PlayerProfile> playerProfiles = new ArrayList<>();
+
 	@OneToOne(fetch = FetchType.EAGER, orphanRemoval=true, cascade = CascadeType.REMOVE)
 	@JoinColumn(name = "timer_id")
 	private Timer timer;
