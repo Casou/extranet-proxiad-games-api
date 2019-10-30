@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
+import com.proxiad.games.extranet.annotation.AdminTokenSecurity;
 import com.proxiad.games.extranet.dto.RiddleDto;
 import com.proxiad.games.extranet.dto.RoomStatusDto;
 import com.proxiad.games.extranet.dto.UnlockDto;
@@ -22,6 +23,7 @@ import com.proxiad.games.extranet.repository.RiddleRepository;
 import com.proxiad.games.extranet.repository.RoomRepository;
 import com.proxiad.games.extranet.repository.TextRepository;
 import com.proxiad.games.extranet.repository.VoiceRepository;
+import com.proxiad.games.extranet.service.RiddleService;
 
 @RestController
 @CrossOrigin
@@ -41,6 +43,9 @@ public class UnlockController {
 
 	@Autowired
 	private VoiceRepository voiceRepository;
+
+	@Autowired
+	private RiddleService riddleService;
 
 	private static final ModelMapper modelMapper = new ModelMapper();
 
@@ -108,6 +113,20 @@ public class UnlockController {
 		this.simpMessagingTemplate.convertAndSend("/topic/room/" + room.getId() + "/unlockRiddle", unlockDto);
 
 		return new ResponseEntity<>("unlocked", HttpStatus.OK);
+	}
+
+	@PostMapping(value = "/open-door")
+	@AdminTokenSecurity
+	public ResponseEntity<?> checkOpenDoor(@RequestBody RiddleDto riddleDto) {
+		Riddle openDoorRiddle = riddleService.resolveOpenDoorRiddle(riddleDto);
+		if (openDoorRiddle.getResolved()) {
+			UnlockDto unlockDto = new UnlockDto();
+			unlockDto.setId(openDoorRiddle.getId());
+			unlockDto.setRoomId(riddleDto.getRoomId());
+			this.simpMessagingTemplate.convertAndSend("/topic/riddle/unlock", unlockDto);
+			return new ResponseEntity<>("", HttpStatus.OK);
+		}
+		return new ResponseEntity<>("", HttpStatus.UNAUTHORIZED);
 	}
 
 }
