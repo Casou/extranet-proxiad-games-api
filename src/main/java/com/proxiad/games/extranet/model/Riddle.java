@@ -36,6 +36,7 @@ public class Riddle {
 	@ManyToOne
 	@JoinColumn(name="room_id", nullable=false)
 	@JsonIgnore
+	@ToString.Exclude
 	private Room room;
 
 }

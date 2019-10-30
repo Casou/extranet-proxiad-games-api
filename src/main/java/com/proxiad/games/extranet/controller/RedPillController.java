@@ -1,6 +1,6 @@
 package com.proxiad.games.extranet.controller;
 
-import java.util.List;
+import javax.persistence.EntityNotFoundException;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.proxiad.games.extranet.dto.RoomDto;
 import com.proxiad.games.extranet.enums.TimerStatusEnum;
 import com.proxiad.games.extranet.mapper.RoomMapper;
-import com.proxiad.games.extranet.model.Riddle;
 import com.proxiad.games.extranet.model.Room;
 import com.proxiad.games.extranet.model.Timer;
 import com.proxiad.games.extranet.repository.RiddleRepository;
@@ -38,21 +37,15 @@ public class RedPillController {
 	private SimpMessagingTemplate simpMessagingTemplate;
 
 	@GetMapping("/redpill")
-	public ResponseEntity<?> applyRedPill(@RequestAttribute("room") Optional<Room> optRoom) {
-		if (!optRoom.isPresent()) {
-			return new ResponseEntity<>("Error in request (cannot retrieve room).", HttpStatus.BAD_REQUEST);
-		}
+	public ResponseEntity<?> applyRedPill(@RequestAttribute("room") Optional<Room> optionalRoom) {
+		Room room = optionalRoom.orElseThrow(() -> new EntityNotFoundException("Something is wrong with your token. Please clear the browser localStorage and login again."));
 
-		Room room = optRoom.get();
 		Timer timer = room.getTimer();
 		if (timer == null) {
 			return new ResponseEntity<>("Error in request (timer not set).", HttpStatus.BAD_REQUEST);
 		}
 
-		// TODO Refacto salle !!!
-		List<Riddle> allRiddles = riddleRepository.findAll();
-
-		if (allRiddles.stream().anyMatch(riddle -> !room.containsRiddle(riddle.getRiddleId()))) {
+		if (room.getRiddles().stream().anyMatch(riddle -> !riddle.getResolved())) {
 			return new ResponseEntity<>("You shouldn't have call the redpill command until all the riddles are resolved.", HttpStatus.FORBIDDEN);
 		}
 

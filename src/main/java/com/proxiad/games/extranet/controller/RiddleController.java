@@ -1,7 +1,6 @@
 package com.proxiad.games.extranet.controller;
 
 import javax.persistence.EntityNotFoundException;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,13 +22,6 @@ public class RiddleController {
 
 	@Autowired
 	private RiddleRepository riddleRepository;
-
-	@GetMapping("/riddle")
-	@AdminTokenSecurity
-	public List<Riddle> getAllRiddles() {
-		// TODO Refacto salle !!!
-		return riddleRepository.findAll();
-	}
 
 	@PutMapping(value = "/riddle")
 	@AdminTokenSecurity

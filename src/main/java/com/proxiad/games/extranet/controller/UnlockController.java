@@ -1,5 +1,6 @@
 package com.proxiad.games.extranet.controller;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -16,14 +17,14 @@ import com.proxiad.games.extranet.annotation.AdminTokenSecurity;
 import com.proxiad.games.extranet.dto.RiddleDto;
 import com.proxiad.games.extranet.dto.RoomStatusDto;
 import com.proxiad.games.extranet.dto.UnlockDto;
-import com.proxiad.games.extranet.enums.TextEnum;
+import com.proxiad.games.extranet.enums.RiddleType;
 import com.proxiad.games.extranet.enums.TimerStatusEnum;
+import com.proxiad.games.extranet.exception.PasswordDontMatchException;
+import com.proxiad.games.extranet.exception.RiddleAlreadySolvedException;
 import com.proxiad.games.extranet.model.*;
-import com.proxiad.games.extranet.repository.RiddleRepository;
-import com.proxiad.games.extranet.repository.RoomRepository;
-import com.proxiad.games.extranet.repository.TextRepository;
 import com.proxiad.games.extranet.repository.VoiceRepository;
 import com.proxiad.games.extranet.service.RiddleService;
+import com.proxiad.games.extranet.service.TextService;
 
 @RestController
 @CrossOrigin
@@ -33,13 +34,7 @@ public class UnlockController {
 	private SimpMessagingTemplate simpMessagingTemplate;
 
 	@Autowired
-	private RoomRepository roomRepository;
-
-	@Autowired
-	private TextRepository textRepository;
-
-	@Autowired
-	private RiddleRepository riddleRepository;
+	private TextService textService;
 
 	@Autowired
 	private VoiceRepository voiceRepository;
@@ -50,11 +45,11 @@ public class UnlockController {
 	private static final ModelMapper modelMapper = new ModelMapper();
 
 	@GetMapping("/unlock/status")
-	public RoomStatusDto getRoomStatus(@RequestAttribute Optional<Room> room) {
-		// TODO Refacto salle !!!
-		List<RiddleDto> riddleDtos = riddleRepository.findAll().stream()
-				.map(riddle -> modelMapper.map(modelMapper, RiddleDto.class))
-				.peek(riddleDto -> riddleDto.setIsResolved(room.orElse(new Room()).containsRiddle(riddleDto.getRiddleId())))
+	public RoomStatusDto getRoomStatus(@RequestAttribute("room") Optional<Room> optionalRoom) {
+		Room room = optionalRoom.orElseThrow(() -> new EntityNotFoundException("Room not found with token association"));
+		List<RiddleDto> riddleDtos = room.getRiddles().stream()
+				.filter(riddle -> riddle.getType().equals(RiddleType.GAME))
+				.map(riddle -> modelMapper.map(riddle, RiddleDto.class))
 				.sorted(Comparator.comparing(RiddleDto::getRiddleId))
 				.collect(Collectors.toList());
 
@@ -64,49 +59,28 @@ public class UnlockController {
 	}
 
 	@PostMapping("/unlock")
-	public ResponseEntity<?> unlockRiddle(@RequestBody UnlockDto unlockDto, @RequestAttribute String token) {
-		Optional<Room> optRoom = roomRepository.findByToken(token);
-		if (!optRoom.isPresent()) {
-			return new ResponseEntity<>("Something is wrong with your token. Please clear the browser localStorage and login again.", HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-
-		Room room = optRoom.get();
+	public ResponseEntity<?> unlockRiddle(@RequestBody UnlockDto unlockDto, @RequestAttribute("room") Optional<Room> optionalRoom) {
+		Room room = optionalRoom.orElseThrow(() -> new EntityNotFoundException("Something is wrong with your token. Please clear the browser localStorage and login again."));
 
 		Timer timer = room.getTimer();
 		if (timer == null || !timer.getStatus().equals(TimerStatusEnum.STARTED)) {
 			return new ResponseEntity<>("Timer is stopped.", HttpStatus.FORBIDDEN);
 		}
 
-		// TODO A Refacto
-		List<Riddle> resolvedRiddles = room.getRiddles();
-		if (resolvedRiddles.stream().anyMatch(riddle -> riddle.getRiddleId().equals(unlockDto.getRiddleId()))) {
+		try {
+			riddleService.resolveRiddle(unlockDto, room);
+		} catch (PasswordDontMatchException | EntityNotFoundException ignored) {
+			return new ResponseEntity<>("Id and password don't match.", HttpStatus.BAD_REQUEST);
+		} catch (RiddleAlreadySolvedException ignored) {
 			return new ResponseEntity<>("Riddle already unlocked.", HttpStatus.FORBIDDEN);
 		}
 
-		// TODO Refacto salle !!!
-		final List<Riddle> allRiddles = riddleRepository.findAll();
-		final Optional<Riddle> optResolvedRiddle = allRiddles.stream().filter(riddle -> riddle.getRiddleId().equals(unlockDto.getRiddleId())
-				&& riddle.getRiddlePassword().equals(unlockDto.getPassword())).findFirst();
-		if (!optResolvedRiddle.isPresent()) {
-			return new ResponseEntity<>("Id and password don't match.", HttpStatus.BAD_REQUEST);
-		}
-
-		final Text textToSend;
-		if ((resolvedRiddles.size() + 1) == allRiddles.size()) {
-			textToSend = textRepository.findAllByDiscriminantOrderByIdAsc(TextEnum.LAST_ENIGMA).get(0);
-		} else {
-			textToSend = textRepository.findAllByDiscriminantOrderByIdAsc(TextEnum.ENIGMA).get(resolvedRiddles.size());
-		}
-
-		Riddle riddle = optResolvedRiddle.get();
-		room.getRiddles().add(riddle);
-		roomRepository.save(room);
+		final Text textToSend = textService.getTextToSendForRiddleResolution(room);
 
 		Voice voice = voiceRepository.findByName(textToSend.getVoiceName()).orElse(new Voice());
 
-		unlockDto.setId(riddle.getId());
 		unlockDto.setRoomId(room.getId());
-		unlockDto.setNbRiddlesResolved(resolvedRiddles.size());
+		unlockDto.setNbRiddlesResolved((int) room.getRiddles().stream().filter(Riddle::getResolved).count());
 		unlockDto.setMessage(textToSend.getText());
 		unlockDto.setVoice(voice);
 		this.simpMessagingTemplate.convertAndSend("/topic/riddle/unlock", unlockDto);

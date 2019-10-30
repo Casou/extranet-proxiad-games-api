@@ -13,7 +13,7 @@ public class RiddleDto {
 	private String name;
 	private String riddleId;
 	private String riddlePassword;
-	private Boolean isResolved;
+	private Boolean resolved;
 	private Integer roomId;
 	private RiddleType type;
 

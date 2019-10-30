@@ -25,7 +25,7 @@ public class Room {
 	@JoinColumn(name = "token_id")
 	private Token connectedToken;
 
-	@OneToMany(orphanRemoval=true, cascade = CascadeType.REMOVE)
+	@OneToMany(orphanRemoval=true, cascade = CascadeType.REMOVE, fetch=FetchType.EAGER)
 	@JoinColumn(name = "room_id")
 	private List<Riddle> riddles = new ArrayList<>();
 
@@ -45,9 +45,5 @@ public class Room {
 
 	@NotNull
 	private Double audioBackgroundVolume = 0.0;
-
-	public boolean containsRiddle(String riddleId) {
-		return riddles.stream().anyMatch(r -> r.getRiddleId().equals(riddleId));
-	}
 
 }

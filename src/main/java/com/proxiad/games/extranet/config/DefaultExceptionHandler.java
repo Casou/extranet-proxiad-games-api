@@ -20,6 +20,7 @@ public class DefaultExceptionHandler {
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public Object exceptionHandler(Exception e) {
+        e.printStackTrace();
         return new HttpEntity<>(e.getMessage());
     }
 
