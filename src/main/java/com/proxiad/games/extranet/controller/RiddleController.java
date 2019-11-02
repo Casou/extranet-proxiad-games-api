@@ -1,20 +1,21 @@
 package com.proxiad.games.extranet.controller;
 
-import javax.persistence.EntityNotFoundException;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import com.proxiad.games.extranet.annotation.AdminTokenSecurity;
 import com.proxiad.games.extranet.dto.RiddleDto;
 import com.proxiad.games.extranet.model.Riddle;
 import com.proxiad.games.extranet.repository.RiddleRepository;
 import com.proxiad.games.extranet.service.RiddleService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import javax.persistence.EntityNotFoundException;
+import javax.transaction.Transactional;
 
 @RestController
 @CrossOrigin
+@Transactional
 public class RiddleController {
 
 	@Autowired

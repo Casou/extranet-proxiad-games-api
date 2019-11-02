@@ -1,21 +1,18 @@
 package com.proxiad.games.extranet.service;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.proxiad.games.extranet.dto.TextDto;
+import com.proxiad.games.extranet.enums.RiddleType;
 import com.proxiad.games.extranet.enums.TextEnum;
 import com.proxiad.games.extranet.exception.ProxiadControllerException;
-import com.proxiad.games.extranet.model.Riddle;
 import com.proxiad.games.extranet.model.Room;
 import com.proxiad.games.extranet.model.Text;
 import com.proxiad.games.extranet.model.Voice;
 import com.proxiad.games.extranet.repository.TextRepository;
 import com.proxiad.games.extranet.repository.VoiceRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class TextService {
@@ -44,13 +41,17 @@ public class TextService {
 	}
 
 	public Text getTextToSendForRiddleResolution(Room room) {
-		final Text textToSend;
-		List<Riddle> resolvedRiddles = room.getRiddles().stream().filter(Riddle::getResolved).collect(Collectors.toList());
-		if (resolvedRiddles.size() == room.getRiddles().size()) {
+		int nbResolvedRiddles = (int) room.getRiddles().stream()
+				.filter(r -> RiddleType.GAME.equals(r.getType()) && r.getResolved())
+				.count();
+		int nbRiddles = (int) room.getRiddles().stream()
+				.filter(r -> RiddleType.GAME.equals(r.getType()))
+				.count();
+		if (nbResolvedRiddles == nbRiddles) {
 			return textRepository.findAllByDiscriminantOrderByIdAsc(TextEnum.LAST_ENIGMA).get(0);
 		}
 
-		return textRepository.findAllByDiscriminantOrderByIdAsc(TextEnum.ENIGMA).get(resolvedRiddles.size());
+		return textRepository.findAllByDiscriminantOrderByIdAsc(TextEnum.ENIGMA).get(nbResolvedRiddles - 1);
 	}
 
 }

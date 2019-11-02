@@ -1,12 +1,11 @@
 package com.proxiad.games.extranet.model;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 
 @Data
 @Entity
@@ -21,7 +20,7 @@ public class PlayerProfile {
     @NotNull
     private String name;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name="room_id", nullable=false)
     @JsonIgnore
     private Room room;

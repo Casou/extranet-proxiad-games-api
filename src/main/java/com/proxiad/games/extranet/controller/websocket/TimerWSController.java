@@ -1,14 +1,5 @@
 package com.proxiad.games.extranet.controller.websocket;
 
-import java.time.LocalDateTime;
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.proxiad.games.extranet.dto.RoomDto;
 import com.proxiad.games.extranet.dto.RoomTrollDto;
 import com.proxiad.games.extranet.enums.MandatoryParameter;
@@ -20,8 +11,19 @@ import com.proxiad.games.extranet.model.Room;
 import com.proxiad.games.extranet.model.Timer;
 import com.proxiad.games.extranet.repository.ParameterRepository;
 import com.proxiad.games.extranet.repository.RoomRepository;
+import com.proxiad.games.extranet.repository.TimerRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.transaction.Transactional;
+import java.time.LocalDateTime;
+import java.util.Optional;
 
 @RestController
+@Transactional
 public class TimerWSController {
 
     @Autowired
@@ -35,6 +37,9 @@ public class TimerWSController {
 
     @Autowired
     private ParameterRepository parameterRepository;
+
+    @Autowired
+    private TimerRepository timerRepository;
 
 
     @MessageMapping("/room/start")
@@ -50,9 +55,10 @@ public class TimerWSController {
                         .build())
                         .getValue());
 
-        final Timer timer = Optional.ofNullable(room.getTimer()).orElse(new Timer());
+        Timer timer = Optional.ofNullable(room.getTimer()).orElse(new Timer());
         timer.setStatus(TimerStatusEnum.INITIALIZING);
         timer.setRemainingTime(Math.max(0, roomDto.getRemainingTime()));
+        timer = timerRepository.save(timer);
         room.setTimer(timer);
         room.setAudioBackgroundVolume(defaultAudioVolume);
         roomRepository.save(room);

@@ -1,10 +1,5 @@
 package com.proxiad.games.extranet.service;
 
-import javax.persistence.EntityNotFoundException;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.proxiad.games.extranet.dto.RiddleDto;
 import com.proxiad.games.extranet.dto.UnlockDto;
 import com.proxiad.games.extranet.enums.RiddleType;
@@ -14,6 +9,10 @@ import com.proxiad.games.extranet.model.Riddle;
 import com.proxiad.games.extranet.model.Room;
 import com.proxiad.games.extranet.repository.RiddleRepository;
 import com.proxiad.games.extranet.repository.RoomRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import javax.persistence.EntityNotFoundException;
 
 @Service
 public class RiddleService {
@@ -53,9 +52,9 @@ public class RiddleService {
     }
 
 
-    public void resolveRiddle(UnlockDto unlockDto, Room room) throws PasswordDontMatchException, RiddleAlreadySolvedException {
+    public Riddle resolveRiddle(UnlockDto unlockDto, Room room) throws PasswordDontMatchException, RiddleAlreadySolvedException {
         Riddle riddle = room.getRiddles().stream()
-                .filter(r -> r.getId().equals(unlockDto.getId()))
+                .filter(r -> r.getRiddleId().equals(unlockDto.getRiddleId()))
                 .findFirst()
                 .orElse(null);
         if (riddle == null) {
@@ -72,6 +71,8 @@ public class RiddleService {
 
         riddle.setResolved(true);
         riddleRepository.save(riddle);
+
+        return riddle;
     }
 
 }

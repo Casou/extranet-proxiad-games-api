@@ -1,11 +1,10 @@
 package com.proxiad.games.extranet.model;
 
-import javax.persistence.*;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.proxiad.games.extranet.enums.RiddleType;
-
 import lombok.*;
+
+import javax.persistence.*;
 
 @Data
 @Entity
@@ -34,7 +33,7 @@ public class Riddle {
 	private RiddleType type;
 
 	@ManyToOne
-	@JoinColumn(name="room_id", nullable=false)
+	@JoinColumn(name="room_id")
 	@JsonIgnore
 	@ToString.Exclude
 	private Room room;

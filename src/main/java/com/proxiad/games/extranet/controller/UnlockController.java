@@ -1,18 +1,5 @@
 package com.proxiad.games.extranet.controller;
 
-import javax.persistence.EntityNotFoundException;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.web.bind.annotation.*;
-
 import com.proxiad.games.extranet.annotation.AdminTokenSecurity;
 import com.proxiad.games.extranet.dto.RiddleDto;
 import com.proxiad.games.extranet.dto.RoomStatusDto;
@@ -25,6 +12,18 @@ import com.proxiad.games.extranet.model.*;
 import com.proxiad.games.extranet.repository.VoiceRepository;
 import com.proxiad.games.extranet.service.RiddleService;
 import com.proxiad.games.extranet.service.TextService;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.web.bind.annotation.*;
+
+import javax.persistence.EntityNotFoundException;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @CrossOrigin
@@ -67,8 +66,9 @@ public class UnlockController {
 			return new ResponseEntity<>("Timer is stopped.", HttpStatus.FORBIDDEN);
 		}
 
+		Riddle riddle;
 		try {
-			riddleService.resolveRiddle(unlockDto, room);
+			riddle = riddleService.resolveRiddle(unlockDto, room);
 		} catch (PasswordDontMatchException | EntityNotFoundException ignored) {
 			return new ResponseEntity<>("Id and password don't match.", HttpStatus.BAD_REQUEST);
 		} catch (RiddleAlreadySolvedException ignored) {
@@ -79,8 +79,11 @@ public class UnlockController {
 
 		Voice voice = voiceRepository.findByName(textToSend.getVoiceName()).orElse(new Voice());
 
+		unlockDto.setId(riddle.getId());
 		unlockDto.setRoomId(room.getId());
-		unlockDto.setNbRiddlesResolved((int) room.getRiddles().stream().filter(Riddle::getResolved).count());
+		unlockDto.setNbRiddlesResolved((int) room.getRiddles().stream()
+				.filter(r -> RiddleType.GAME.equals(r.getType()) && r.getResolved())
+				.count());
 		unlockDto.setMessage(textToSend.getText());
 		unlockDto.setVoice(voice);
 		this.simpMessagingTemplate.convertAndSend("/topic/riddle/unlock", unlockDto);

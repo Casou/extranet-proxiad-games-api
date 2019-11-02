@@ -1,14 +1,5 @@
 package com.proxiad.games.extranet.service;
 
-import javax.persistence.EntityNotFoundException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.proxiad.games.extranet.dto.RoomDto;
 import com.proxiad.games.extranet.enums.MandatoryParameter;
 import com.proxiad.games.extranet.enums.RiddleType;
@@ -16,12 +7,19 @@ import com.proxiad.games.extranet.mapper.RoomMapper;
 import com.proxiad.games.extranet.model.Parameter;
 import com.proxiad.games.extranet.model.Riddle;
 import com.proxiad.games.extranet.model.Room;
-import com.proxiad.games.extranet.repository.ParameterRepository;
-import com.proxiad.games.extranet.repository.RiddleRepository;
-import com.proxiad.games.extranet.repository.RoomRepository;
-import com.proxiad.games.extranet.repository.TokenRepository;
+import com.proxiad.games.extranet.repository.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import javax.persistence.EntityNotFoundException;
+import javax.transaction.Transactional;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class RoomService {
 
 	@Autowired
@@ -35,9 +33,6 @@ public class RoomService {
 
 	@Autowired
 	private ParameterRepository parameterRepository;
-
-	@Autowired
-	private TokenRepository tokenRepository;
 
 	public List<RoomDto> findAll() {
 		return roomRepository.findAll().stream()
@@ -93,15 +88,6 @@ public class RoomService {
 	public void deleteRoom(Integer roomId) {
 		Room room = roomRepository.findById(roomId)
 				.orElseThrow(() -> new EntityNotFoundException("No room with id " + roomId));
-
-		// TODO Gérer le onDeleteCascade en automatique plutôt que manuellement
-		room.setTimer(null);
-		room.getRiddles().forEach(riddle -> riddleRepository.delete(riddle));
-		room.setRiddles(null);
-		if (room.getConnectedToken() != null) {
-			tokenRepository.delete(room.getConnectedToken());
-		}
-
 		roomRepository.delete(room);
 	}
 

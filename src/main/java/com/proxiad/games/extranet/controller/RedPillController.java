@@ -1,8 +1,12 @@
 package com.proxiad.games.extranet.controller;
 
-import javax.persistence.EntityNotFoundException;
-import java.util.Optional;
-
+import com.proxiad.games.extranet.dto.RoomDto;
+import com.proxiad.games.extranet.enums.RiddleType;
+import com.proxiad.games.extranet.enums.TimerStatusEnum;
+import com.proxiad.games.extranet.mapper.RoomMapper;
+import com.proxiad.games.extranet.model.Room;
+import com.proxiad.games.extranet.model.Timer;
+import com.proxiad.games.extranet.repository.RoomRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,20 +16,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.proxiad.games.extranet.dto.RoomDto;
-import com.proxiad.games.extranet.enums.TimerStatusEnum;
-import com.proxiad.games.extranet.mapper.RoomMapper;
-import com.proxiad.games.extranet.model.Room;
-import com.proxiad.games.extranet.model.Timer;
-import com.proxiad.games.extranet.repository.RiddleRepository;
-import com.proxiad.games.extranet.repository.RoomRepository;
+import javax.persistence.EntityNotFoundException;
+import java.util.Optional;
 
 @RestController
 @CrossOrigin
 public class RedPillController {
-
-	@Autowired
-	private RiddleRepository riddleRepository;
 
 	@Autowired
 	private RoomRepository roomRepository;
@@ -45,7 +41,7 @@ public class RedPillController {
 			return new ResponseEntity<>("Error in request (timer not set).", HttpStatus.BAD_REQUEST);
 		}
 
-		if (room.getRiddles().stream().anyMatch(riddle -> !riddle.getResolved())) {
+		if (room.getRiddles().stream().filter(r -> RiddleType.GAME.equals(r.getType())).anyMatch(riddle -> !riddle.getResolved())) {
 			return new ResponseEntity<>("You shouldn't have call the redpill command until all the riddles are resolved.", HttpStatus.FORBIDDEN);
 		}
 
