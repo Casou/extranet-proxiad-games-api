@@ -1,16 +1,17 @@
 package com.proxiad.games.extranet.controller;
 
-import javax.persistence.EntityNotFoundException;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
 import com.proxiad.games.extranet.annotation.AdminTokenSecurity;
 import com.proxiad.games.extranet.dto.PlayerProfileDto;
 import com.proxiad.games.extranet.model.PlayerProfile;
+import com.proxiad.games.extranet.model.Room;
 import com.proxiad.games.extranet.repository.PlayerProfileRepository;
+import com.proxiad.games.extranet.repository.RoomRepository;
 import com.proxiad.games.extranet.service.PlayerProfileService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import javax.persistence.EntityNotFoundException;
+import java.util.List;
 
 @RestController
 @CrossOrigin
@@ -21,6 +22,9 @@ public class PlayerProfileController {
 
     @Autowired
     private PlayerProfileRepository playerProfileRepository;
+
+    @Autowired
+    private RoomRepository roomRepository;
 
     @GetMapping("/player-profile/{roomId}")
     @AdminTokenSecurity
@@ -47,7 +51,13 @@ public class PlayerProfileController {
         PlayerProfile profile = playerProfileRepository.findById(playerProfileId)
                 .orElseThrow(() -> new EntityNotFoundException("Player profile not found for id " + playerProfileId));
 
+        Room room = roomRepository.findById(profile.getRoom().getId())
+                .orElseThrow(() -> new EntityNotFoundException("No riddle's room with id " + profile.getRoom().getId()));
+
+        room.getPlayerProfiles().remove(profile);
+
         playerProfileRepository.delete(profile);
+        roomRepository.save(room);
     }
 
 }

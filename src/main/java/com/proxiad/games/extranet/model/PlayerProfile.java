@@ -20,7 +20,7 @@ public class PlayerProfile {
     @NotNull
     private String name;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name="room_id", nullable=false)
     @JsonIgnore
     private Room room;

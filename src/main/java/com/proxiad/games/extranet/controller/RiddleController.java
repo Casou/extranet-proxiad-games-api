@@ -3,7 +3,9 @@ package com.proxiad.games.extranet.controller;
 import com.proxiad.games.extranet.annotation.AdminTokenSecurity;
 import com.proxiad.games.extranet.dto.RiddleDto;
 import com.proxiad.games.extranet.model.Riddle;
+import com.proxiad.games.extranet.model.Room;
 import com.proxiad.games.extranet.repository.RiddleRepository;
+import com.proxiad.games.extranet.repository.RoomRepository;
 import com.proxiad.games.extranet.service.RiddleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,6 +25,9 @@ public class RiddleController {
 
 	@Autowired
 	private RiddleRepository riddleRepository;
+
+	@Autowired
+	private RoomRepository roomRepository;
 
 	@PutMapping(value = "/riddle")
 	@AdminTokenSecurity
@@ -68,7 +73,14 @@ public class RiddleController {
 	public ResponseEntity<?> deleteRiddle(@PathVariable("id") Integer id) {
 		Riddle riddle = riddleRepository.findById(id)
 				.orElseThrow(() -> new EntityNotFoundException("No riddle with id " + id));
+
+		Room room = roomRepository.findById(riddle.getRoom().getId())
+				.orElseThrow(() -> new EntityNotFoundException("No riddle's room with id " + riddle.getRoom().getId()));
+
+		room.getRiddles().remove(riddle);
+
 		riddleRepository.delete(riddle);
+		roomRepository.save(room);
 
 		return new ResponseEntity<>("deleted", HttpStatus.OK);
 	}
