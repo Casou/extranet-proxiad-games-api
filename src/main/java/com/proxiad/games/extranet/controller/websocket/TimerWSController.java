@@ -97,6 +97,21 @@ public class TimerWSController {
         return roomTrollDto;
     }
 
+//    @MessageMapping("/room/reduceTime")
+//    @SendTo("/topic/room/admin/reduceTime")
+//    public RoomTrollDto reduceTimerByTroll(ModifyTimeDto modifyTimeDto) throws ProxiadControllerException {
+//        Optional<Room> optRoom = roomRepository.findById(roomTrollDto.getId());
+//        if (!optRoom.isPresent()) {
+//            throw new ProxiadControllerException("Room with id " + roomTrollDto.getId() + " not found");
+//        }
+//
+//        Timer timer = optRoom.get().getTimer();
+//        roomTrollDto.setStartTime(timer.getClientStartTime());
+//        roomTrollDto.setRemainingTime(timer.getRemainingTime());
+//
+//        return roomTrollDto;
+//    }
+
     @MessageMapping("/room/pause")
     public void pause(RoomDto roomDto) throws ProxiadControllerException {
         final Room room = getRoom(roomDto);

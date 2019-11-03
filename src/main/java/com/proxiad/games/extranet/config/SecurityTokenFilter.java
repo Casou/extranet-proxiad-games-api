@@ -31,6 +31,7 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Configuration
@@ -52,8 +53,14 @@ public class SecurityTokenFilter extends GenericFilterBean {
 
     @Value("${logging.custom.request.level}")
     private CustomLogLevel requestLogLevel = CustomLogLevel.NONE;
+
     @Value("${logging.custom.response.level}")
     private CustomLogLevel responseLogLevel = CustomLogLevel.NONE;
+
+    private Predicate<String> ignoreUri = uri -> uri.contains("/console")
+            || uri.contains("/ws")
+            || uri.contains("/actuator")
+            || uri.contains("/favicon.ico");
 
     @Bean
     @Primary
@@ -82,10 +89,17 @@ public class SecurityTokenFilter extends GenericFilterBean {
                 .filter(entry -> matchUri(uri, entry))
                 .filter(entry -> matchMethod(request, entry))
                 .collect(Collectors.toList());
-        HandlerMethod handlerMethod = filteredMethods.size() > 0 ? filteredMethods.get(0).getValue() : null;
 
         CustomLogRequestWrapper requestWrapper = new CustomLogRequestWrapper(request);
         CustomLogResponseWrapper responseWrapper = new CustomLogResponseWrapper(response);
+
+        if (filteredMethods.size() == 0 && !ignoreUri.test(request.getRequestURI())) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            logResponse(responseWrapper, requestWrapper, String.format("URI %s not found", uri));
+            return;
+        }
+
+        HandlerMethod handlerMethod = filteredMethods.size() > 0 ? filteredMethods.get(0).getValue() : null;
 
         logRequest(requestWrapper);
 
@@ -102,7 +116,7 @@ public class SecurityTokenFilter extends GenericFilterBean {
             return;
         }
 
-        if (allowRequestWithSpecialToken(handlerMethod, token)) {
+        if (allowRequestWithSpecialToken(token, handlerMethod)) {
             response.setStatus(HttpServletResponse.SC_OK);
             filterChain.doFilter(requestWrapper, responseWrapper);
             logResponse(responseWrapper, requestWrapper);
@@ -133,7 +147,7 @@ public class SecurityTokenFilter extends GenericFilterBean {
                         .anyMatch(methodType -> methodType.name().equals(request.getMethod()));
     }
 
-    private boolean allowRequestWithSpecialToken(HandlerMethod handlerMethod, String tokenString) {
+    private boolean allowRequestWithSpecialToken(String tokenString, HandlerMethod handlerMethod) {
         if (handlerMethod != null && handlerMethod.getMethodAnnotation(AdminTokenSecurity.class) != null) {
             return tokenString.equals(adminToken);
         }
@@ -142,10 +156,7 @@ public class SecurityTokenFilter extends GenericFilterBean {
     }
 
     private boolean allowRequestWithoutToken(HttpServletRequest request, HandlerMethod handlerMethod) {
-        return request.getRequestURI().contains("/console")
-                || request.getRequestURI().contains("/ws")
-                || request.getRequestURI().contains("/actuator")
-                || request.getRequestURI().contains("/favicon.ico")
+        return ignoreUri.test(request.getRequestURI())
                 || (handlerMethod != null && handlerMethod.getMethodAnnotation(BypassSecurity.class) != null);
     }
 

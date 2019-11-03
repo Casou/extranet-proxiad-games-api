@@ -1,16 +1,8 @@
 package com.proxiad.games.extranet.controller;
 
-import javax.persistence.EntityNotFoundException;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.web.bind.annotation.*;
-
 import com.proxiad.games.extranet.annotation.AdminTokenSecurity;
 import com.proxiad.games.extranet.annotation.BypassSecurity;
+import com.proxiad.games.extranet.dto.ModifyTimeDto;
 import com.proxiad.games.extranet.dto.RoomDto;
 import com.proxiad.games.extranet.dto.RoomTrollDto;
 import com.proxiad.games.extranet.mapper.RoomMapper;
@@ -18,6 +10,14 @@ import com.proxiad.games.extranet.model.Room;
 import com.proxiad.games.extranet.repository.RoomRepository;
 import com.proxiad.games.extranet.service.RoomService;
 import com.proxiad.games.extranet.service.TrollService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.web.bind.annotation.*;
+
+import javax.persistence.EntityNotFoundException;
+import java.util.List;
 
 @RestController
 @CrossOrigin
@@ -87,6 +87,15 @@ public class RoomController {
 
         this.simpMessagingTemplate.convertAndSend("/topic/room/admin/troll", roomTrollDto);
         this.simpMessagingTemplate.convertAndSend("/topic/room/" + room.getId() + "/troll", roomTrollDto);
+    }
+
+    @PostMapping("/room/modifyTime")
+    @AdminTokenSecurity
+    public void modifyTime(@RequestBody ModifyTimeDto modifyTimeDto) {
+        modifyTimeDto = trollService.modifyTime(modifyTimeDto);
+
+        this.simpMessagingTemplate.convertAndSend("/topic/room/admin/modifyTime", modifyTimeDto);
+        this.simpMessagingTemplate.convertAndSend("/topic/room/" + modifyTimeDto.getRoomId() + "/modifyTime", modifyTimeDto);
     }
 
 }

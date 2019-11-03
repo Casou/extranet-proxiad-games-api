@@ -1,12 +1,6 @@
 package com.proxiad.games.extranet.service;
 
-import javax.persistence.EntityNotFoundException;
-import java.util.List;
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
+import com.proxiad.games.extranet.dto.ModifyTimeDto;
 import com.proxiad.games.extranet.dto.RoomTrollDto;
 import com.proxiad.games.extranet.enums.MandatoryParameter;
 import com.proxiad.games.extranet.enums.TextEnum;
@@ -15,6 +9,12 @@ import com.proxiad.games.extranet.repository.ParameterRepository;
 import com.proxiad.games.extranet.repository.RoomRepository;
 import com.proxiad.games.extranet.repository.TextRepository;
 import com.proxiad.games.extranet.repository.VoiceRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import javax.persistence.EntityNotFoundException;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class TrollService {
@@ -63,6 +63,22 @@ public class TrollService {
                 .voice(voice)
                 .videoName(trollText.getVideoName())
                 .build();
+    }
+
+    public ModifyTimeDto modifyTime(ModifyTimeDto modifyTimeDto) {
+        Room room = roomRepository.findById(modifyTimeDto.getRoomId())
+                .orElseThrow(() -> new EntityNotFoundException(String.format("Room %d not found", modifyTimeDto.getRoomId())));
+        final Timer timer = Optional.ofNullable(room.getTimer())
+                .orElseThrow(() -> new EntityNotFoundException("No timer found for the room " + room.getName()));
+        final int remainingTime = Math.max(0, timer.getRemainingTime() + modifyTimeDto.getTime());
+        timer.setRemainingTime(remainingTime);
+        room.setTimer(timer);
+        roomRepository.save(room);
+
+        modifyTimeDto.setStartTime(timer.getClientStartTime());
+        modifyTimeDto.setRemainingTime(remainingTime);
+
+        return modifyTimeDto;
     }
 
 }
