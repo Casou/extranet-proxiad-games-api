@@ -44,7 +44,7 @@ public class TextController {
 		return textRepository.save(new Text(TextEnum.PROGRESS_BAR));
 	}
 
-	@PostMapping("/enigma")
+	@PostMapping("/riddle")
 	@AdminTokenSecurity
 	public Text createEnigma() {
 		return textRepository.save(new Text(TextEnum.ENIGMA));
@@ -62,11 +62,11 @@ public class TextController {
 		textService.updateSentence(introSentence);
 	}
 
-	@DeleteMapping
+	@DeleteMapping(value = "/{id}")
 	@AdminTokenSecurity
-	public void deleteSentence(@RequestBody Text introSentence) throws ProxiadControllerException {
-		Optional<Text> optIntro = textRepository.findById(introSentence.getId());
-		Text introSentenceToDelete = optIntro.orElseThrow(() -> new ProxiadControllerException("Text not found for id " + introSentence.getId()));
+	public void deleteSentence(@PathVariable("id") Integer id) throws ProxiadControllerException {
+		Optional<Text> optIntro = textRepository.findById(id);
+		Text introSentenceToDelete = optIntro.orElseThrow(() -> new ProxiadControllerException("Text not found for id " + id));
 		textRepository.delete(introSentenceToDelete);
 	}
 

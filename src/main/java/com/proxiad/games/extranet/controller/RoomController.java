@@ -1,5 +1,14 @@
 package com.proxiad.games.extranet.controller;
 
+import javax.persistence.EntityNotFoundException;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.web.bind.annotation.*;
+
 import com.proxiad.games.extranet.annotation.AdminTokenSecurity;
 import com.proxiad.games.extranet.annotation.BypassSecurity;
 import com.proxiad.games.extranet.dto.ModifyTimeDto;
@@ -10,14 +19,6 @@ import com.proxiad.games.extranet.model.Room;
 import com.proxiad.games.extranet.repository.RoomRepository;
 import com.proxiad.games.extranet.service.RoomService;
 import com.proxiad.games.extranet.service.TrollService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.web.bind.annotation.*;
-
-import javax.persistence.EntityNotFoundException;
-import java.util.List;
 
 @RestController
 @CrossOrigin
@@ -50,7 +51,7 @@ public class RoomController {
         return new ResponseEntity<>(roomService.newRoom(), HttpStatus.OK);
     }
 
-    @PostMapping(value = "/room/{id}/name")
+    @PatchMapping(value = "/room/{id}/name")
     @AdminTokenSecurity
     public ResponseEntity<?> updateRoomName(@PathVariable("id") Integer id, @RequestBody RoomDto updatedRoom) {
         Room room = roomRepository.findById(id)
@@ -68,7 +69,7 @@ public class RoomController {
         return new ResponseEntity<>("deleted", HttpStatus.OK);
     }
 
-    @PatchMapping(value = "/room/{id}/reinit")
+    @PostMapping(value = "/room/{id}/reinit")
     @AdminTokenSecurity
     public ResponseEntity<?> reinitRoom(@PathVariable("id") Integer id) {
         Room room = roomService.reinitRoom(id);
